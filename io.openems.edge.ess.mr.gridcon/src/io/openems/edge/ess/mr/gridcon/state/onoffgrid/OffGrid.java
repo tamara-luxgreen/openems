@@ -7,11 +7,11 @@ import io.openems.edge.ess.mr.gridcon.IState;
 import io.openems.edge.ess.mr.gridcon.WeightingHelper;
 import io.openems.edge.ess.mr.gridcon.enums.Mode;
 
-public class OffGrid extends BaseState {
+public class OffGridRunning extends BaseState {
 
 	private float targetFrequencyOffgrid;
 
-	public OffGrid(ComponentManager manager, DecisionTableCondition condition, String gridconPcsId, String b1Id,
+	public OffGridRunning(ComponentManager manager, DecisionTableCondition condition, String gridconPcsId, String b1Id,
 			String b2Id, String b3Id, String inputNa1, String inputNa2, String inputSyncBridge, String outputSyncBridge,
 			String meterId, float targetFrequencyOffgrid, boolean na1Inverted, boolean na2Inverted,
 			boolean inputSyncInverted) {
@@ -22,7 +22,7 @@ public class OffGrid extends BaseState {
 
 	@Override
 	public IState getState() {
-		return OnOffGridState.OFF_GRID_MODE;
+		return OnOffGridState.OFF_GRID_RUNNING_MODE;
 	}
 
 	@Override
@@ -40,11 +40,11 @@ public class OffGrid extends BaseState {
 			return OnOffGridState.OFF_GRID_MODE_ADJUST_PARMETER;
 		}
 
-		if (DecisionTableHelper.isOffGridMode(condition)) {
-			return OnOffGridState.OFF_GRID_MODE;
+		if (DecisionTableHelper.isOffGridRunningMode(condition)) {
+			return OnOffGridState.OFF_GRID_RUNNING_MODE;
 		}
 
-		return OnOffGridState.OFF_GRID_MODE;
+		return OnOffGridState.OFF_GRID_RUNNING_MODE;
 	}
 
 	@Override

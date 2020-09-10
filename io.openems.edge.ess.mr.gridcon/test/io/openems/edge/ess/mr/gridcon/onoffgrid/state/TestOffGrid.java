@@ -16,19 +16,19 @@ import io.openems.edge.ess.mr.gridcon.state.onoffgrid.DecisionTableCondition.NaP
 import io.openems.edge.ess.mr.gridcon.state.onoffgrid.DecisionTableCondition.NaProtection2On;
 import io.openems.edge.ess.mr.gridcon.state.onoffgrid.DecisionTableCondition.SyncBridgeOn;
 import io.openems.edge.ess.mr.gridcon.state.onoffgrid.DecisionTableCondition.VoltageInRange;
-import io.openems.edge.ess.mr.gridcon.state.onoffgrid.OffGrid;
+import io.openems.edge.ess.mr.gridcon.state.onoffgrid.OffGridRunning;
 import io.openems.edge.ess.mr.gridcon.state.onoffgrid.OnOffGridState;
 
-public class TestOffGrid {
+public class TestOffGridRunning {
 
-	private OffGrid sut;
+	private OffGridRunning sut;
 	private DummyComponentManager manager = Creator.getDummyComponentManager();
 	private static DummyDecisionTableCondition condition;
 		
 	@Before
 	public void setUp() throws Exception {
 		condition = new DummyDecisionTableCondition(NaProtection1On.TRUE, NaProtection2On.TRUE, GridconCommunicationFailed.TRUE, MeterCommunicationFailed.TRUE, VoltageInRange.TRUE, SyncBridgeOn.TRUE);
-		sut = new OffGrid(//
+		sut = new OffGridRunning(//
 				manager  
 				, condition//
 				, Creator.GRIDCON_ID//
@@ -49,7 +49,7 @@ public class TestOffGrid {
 
 	@Test
 	public final void testGetState() {
-		assertEquals(OnOffGridState.OFF_GRID_MODE, sut.getState());
+		assertEquals(OnOffGridState.OFF_GRID_RUNNING_MODE, sut.getState());
 	}
 	
 	@Test
@@ -63,10 +63,10 @@ public class TestOffGrid {
 	public void testGetNextStateOffGrid() {
 		// According to the state machine the next state is "OFF_GRID" if condition is 0,0,0,0,0,-
 		setCondition(NaProtection1On.FALSE, NaProtection2On.FALSE, GridconCommunicationFailed.FALSE, MeterCommunicationFailed.FALSE, VoltageInRange.FALSE, SyncBridgeOn.FALSE);
-		assertEquals(OnOffGridState.OFF_GRID_MODE, sut.getNextState());
+		assertEquals(OnOffGridState.OFF_GRID_RUNNING_MODE, sut.getNextState());
 
 		setCondition(NaProtection1On.FALSE, NaProtection2On.FALSE, GridconCommunicationFailed.FALSE, MeterCommunicationFailed.FALSE, VoltageInRange.FALSE, SyncBridgeOn.TRUE);
-		assertEquals(OnOffGridState.OFF_GRID_MODE, sut.getNextState());
+		assertEquals(OnOffGridState.OFF_GRID_RUNNING_MODE, sut.getNextState());
 	}
 	
 	@Test
