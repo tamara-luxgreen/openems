@@ -70,12 +70,12 @@ public class EssGridConOnOffGrid extends EssGridcon
 		// TODO
 		GridMode gridMode = GridMode.UNDEFINED;
 
-		if (this.stateObject != null) {
+		if (this.mainStateObject != null) {
 			if (//
-			OnOffGridState.ON_GRID_MODE == this.stateObject.getState()//
+			OnOffGridState.ON_GRID == this.mainStateObject.getState()//
 			) {
 				gridMode = GridMode.ON_GRID;
-			} else if (OnOffGridState.OFF_GRID_MODE == this.stateObject.getState()) {
+			} else if (OnOffGridState.OFF_GRID == this.mainStateObject.getState()) {
 				gridMode = GridMode.OFF_GRID;
 			}
 		}
@@ -86,7 +86,7 @@ public class EssGridConOnOffGrid extends EssGridcon
 	@Override
 	protected void writeStateMachineToChannel() {
 		this.channel(io.openems.edge.ess.mr.gridcon.onoffgrid.ChannelId.STATE_MACHINE)
-				.setNextValue(this.stateObject.getState());
+				.setNextValue(this.mainStateObject.getState());
 	}
 
 	protected void checkConfiguration(Config config) throws OpenemsException {
@@ -104,13 +104,13 @@ public class EssGridConOnOffGrid extends EssGridcon
 	}
 
 	@Override
-	protected io.openems.edge.ess.mr.gridcon.StateObject getFirstStateObjectUndefined() {
-		return StateController.getStateObject(OnOffGridState.UNDEFINED);
+	protected io.openems.edge.ess.mr.gridcon.StateObject getFirstGeneralStateObjectUndefined() {
+		return StateController.getGeneralStateObject(OnOffGridState.UNDEFINED);
 	}
 
 	@Override
 	protected void initializeStateController(String gridconPcs, String b1, String b2, String b3) {
-		DecisionTableCondition tableCondition = new DecisionTableConditionImpl(componentManager, gridconPcs,
+		DecisionTableCondition tableCondition = new DecisionTableConditionImpl(componentManager, 
 				config.meter_id(), config.inputNaProtection1(), config.inputNaProtection2(),
 				config.inputSyncDeviceBridge(), config.isNaProtection1Inverted(), config.isNaProtection2Inverted(),
 				config.isInputSyncDeviceBridgeInverted());

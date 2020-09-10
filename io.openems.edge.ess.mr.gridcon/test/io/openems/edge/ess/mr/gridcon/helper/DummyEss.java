@@ -116,19 +116,7 @@ public class DummyEss extends AbstractOpenemsComponent implements GridconPcs {
 	}
 
 	@Override
-	public void setModeSelection(Mode currentControl) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void setSyncApproval(boolean b) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void setBlackStartApproval(boolean b) {
+	public void setMode(Mode currentControl) {
 		// TODO Auto-generated method stub
 		
 	}

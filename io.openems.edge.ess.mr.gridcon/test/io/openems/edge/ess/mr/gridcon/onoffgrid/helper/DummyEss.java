@@ -27,7 +27,7 @@ public class DummyEss extends EssGridcon  {
 	}
 
 	@Override
-	protected StateObject getFirstStateObjectUndefined() {
+	protected StateObject getFirstGeneralStateObjectUndefined() {
 		// TODO Auto-generated method stub
 		return null;
 	}

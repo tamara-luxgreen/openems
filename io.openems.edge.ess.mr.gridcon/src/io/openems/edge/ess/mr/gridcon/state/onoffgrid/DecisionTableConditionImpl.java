@@ -2,20 +2,17 @@ package io.openems.edge.ess.mr.gridcon.state.onoffgrid;
 
 import java.util.Optional;
 
-import io.openems.common.exceptions.OpenemsError.OpenemsNamedException;
 import io.openems.common.types.ChannelAddress;
 import io.openems.edge.bridge.modbus.api.AbstractOpenemsModbusComponent;
 import io.openems.edge.bridge.modbus.api.BridgeModbus;
 import io.openems.edge.common.channel.BooleanReadChannel;
 import io.openems.edge.common.channel.StateChannel;
 import io.openems.edge.common.component.ComponentManager;
-import io.openems.edge.ess.mr.gridcon.GridconPcs;
 import io.openems.edge.meter.api.SymmetricMeter;
 
 public class DecisionTableConditionImpl implements DecisionTableCondition {
 
 	private ComponentManager manager;
-	private String gridconPcsId;
 	private String meterId;
 	private String inputNaProtection1;
 	private String inputNaProtection2;
@@ -24,12 +21,10 @@ public class DecisionTableConditionImpl implements DecisionTableCondition {
 	private boolean nA2Inverted;
 	private boolean isSyncBridgeInverted;
 
-	public DecisionTableConditionImpl(ComponentManager manager, String gridconPcsId, String meterId,
+	public DecisionTableConditionImpl(ComponentManager manager, String meterId,
 			String inputNaProtection1, String inputNaProtection2, String inputSyncBridge, boolean isNa1Inverted,
 			boolean isNa2Inverted, boolean isSyncBridgeInverted) {
-		super();
 		this.manager = manager;
-		this.gridconPcsId = gridconPcsId;
 		this.meterId = meterId;
 		this.inputNaProtection1 = inputNaProtection1;
 		this.inputNaProtection2 = inputNaProtection2;
@@ -78,21 +73,6 @@ public class DecisionTableConditionImpl implements DecisionTableCondition {
 			}
 		} catch (Exception e) {
 			return NaProtection2On.UNSET;
-		}
-	}
-
-	@Override
-	public GridconCommunicationFailed isGridconCommunicationFailed() {
-		GridconPcs gridconPcs;
-		try {
-			gridconPcs = manager.getComponent(gridconPcsId);
-			if (gridconPcs.isCommunicationBroken()) {
-				return GridconCommunicationFailed.TRUE;
-			} else {
-				return GridconCommunicationFailed.FALSE;
-			}
-		} catch (OpenemsNamedException e) {
-			return GridconCommunicationFailed.UNSET;
 		}
 	}
 
@@ -160,7 +140,7 @@ public class DecisionTableConditionImpl implements DecisionTableCondition {
 			return SyncBridgeOn.UNSET;
 		}
 	}
-
+	
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
@@ -170,10 +150,6 @@ public class DecisionTableConditionImpl implements DecisionTableCondition {
 
 		sb.append("Input NA Protection 2: ");
 		sb.append(isNaProtection2On());
-		sb.append("\n");
-
-		sb.append("GridconCommunicationFailed: ");
-		sb.append(isGridconCommunicationFailed());
 		sb.append("\n");
 
 		sb.append("MeterCommunicationFailed: ");
@@ -190,4 +166,5 @@ public class DecisionTableConditionImpl implements DecisionTableCondition {
 
 		return sb.toString();
 	}
+	
 }

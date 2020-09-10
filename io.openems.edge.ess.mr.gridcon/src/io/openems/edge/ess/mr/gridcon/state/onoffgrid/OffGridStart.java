@@ -2,44 +2,52 @@ package io.openems.edge.ess.mr.gridcon.state.onoffgrid;
 
 import io.openems.common.exceptions.OpenemsError.OpenemsNamedException;
 import io.openems.edge.common.component.ComponentManager;
+import io.openems.edge.ess.mr.gridcon.GridconPcs;
+import io.openems.edge.ess.mr.gridcon.GridconSettings;
 import io.openems.edge.ess.mr.gridcon.IState;
+import io.openems.edge.ess.mr.gridcon.enums.Mode;
 
-public class WaitForDevices extends BaseState {
+public class OffGridStart extends BaseState {
 
-	public WaitForDevices(ComponentManager manager, DecisionTableCondition condition, String gridconPcsId, String b1Id,
-			String b2Id, String b3Id, String inputNa1, String inputNa2, String inputSyncBridge, String outputSyncBridge,
-			String meterId, boolean na1Inverted, boolean na2Inverted, boolean inputSyncInverted) {
-		super(manager, condition, gridconPcsId, b1Id, b2Id, b3Id, inputNa1, inputNa2, inputSyncBridge, outputSyncBridge,
-				meterId, na1Inverted, na2Inverted);
+	private float targetFrequencyOffgrid;
+
+	public OffGridStart(ComponentManager manager, DecisionTableCondition condition, String outputSyncBridge,
+			String meterId, float targetFrequencyOffgrid) {
+		super(manager, condition, outputSyncBridge,	meterId);
+		this.targetFrequencyOffgrid = targetFrequencyOffgrid;
 	}
-
+	
 	@Override
 	public IState getState() {
-		return OnOffGridState.WAIT_FOR_DEVICES;
+		return OnOffGridState.OFF_GRID_START;
 	}
 
 	@Override
 	public IState getNextState() {
 
-		if (DecisionTableHelper.isWaitingForDevices(condition)) {
-			return OnOffGridState.WAIT_FOR_DEVICES;
+		if (DecisionTableHelper.isOffGridStart(condition)) {
+			return OnOffGridState.OFF_GRID_START;
 		}
 
-		if (DecisionTableHelper.isOnGridMode(condition)) {
-			return OnOffGridState.ON_GRID_MODE;
+		if (DecisionTableHelper.isOffGrid(condition)) {
+			return OnOffGridState.OFF_GRID;
+		}
+		
+		if (DecisionTableHelper.isOffGridGridBackInverterOff(condition)) {
+			return OnOffGridState.OFF_GRID_GRID_BACK_INVERTER_OFF;
 		}
 
-		if (DecisionTableHelper.isUndefined(condition)) {
-			return OnOffGridState.UNDEFINED;
-		}
-
-		return OnOffGridState.WAIT_FOR_DEVICES;
+		return OnOffGridState.UNDEFINED;
 	}
 
 	@Override
 	public void act() throws OpenemsNamedException {
-		// TODO Auto-generated method stub
-
+		setSyncBridge(true);
 	}
 
+	@Override
+	public GridconSettings getGridconSettings() {
+		float factor = targetFrequencyOffgrid / GridconPcs.DEFAULT_GRID_FREQUENCY;
+		return GridconSettings.createRunningSettings(1, factor, Mode.VOLTAGE_CONTROL);
+	}
 }

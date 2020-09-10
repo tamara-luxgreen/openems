@@ -188,18 +188,8 @@ public class DummyGridcon extends AbstractOpenemsComponent implements GridconPcs
 	}
 
 	@Override
-	public void setModeSelection(Mode mode) {
+	public void setMode(Mode mode) {
 		this.mode = mode;
-	}
-
-	@Override
-	public void setSyncApproval(boolean b) {
-		syncApproval = b;
-	}
-
-	@Override
-	public void setBlackStartApproval(boolean b) {
-		blackStartApproval = b;
 	}
 
 	@Override

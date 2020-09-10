@@ -2,28 +2,19 @@ package io.openems.edge.ess.mr.gridcon.state.onoffgrid;
 
 import io.openems.common.exceptions.OpenemsError.OpenemsNamedException;
 import io.openems.edge.common.component.ComponentManager;
-import io.openems.edge.ess.mr.gridcon.GridconPcs;
+import io.openems.edge.ess.mr.gridcon.GridconSettings;
 import io.openems.edge.ess.mr.gridcon.IState;
+import io.openems.edge.ess.mr.gridcon.enums.Mode;
 
-public class WaitForGridAvailable extends BaseState {
+public class OffGridGridBackRelaisDefect extends BaseState {
 
-	// TODO in diesem state darf ich max. 30 sekunden verbleiben
-	// danach muss ich den mr runterfahren...=> outputHardresetrelay für mr setzen
-
-	private float targetFrequencyOffgrid;
-
-	public WaitForGridAvailable(ComponentManager manager, DecisionTableCondition condition, String gridconPcsId,
-			String b1Id, String b2Id, String b3Id, String inputNa1, String inputNa2, String inputSyncBridge,
-			String outputSyncBridge, String meterId, float targetFrequencyOffgrid, boolean na1Inverted,
-			boolean na2Inverted, boolean inputSyncInverted) {
-		super(manager, condition, gridconPcsId, b1Id, b2Id, b3Id, inputNa1, inputNa2, inputSyncBridge, outputSyncBridge,
-				meterId, na1Inverted, na2Inverted);
-		this.targetFrequencyOffgrid = targetFrequencyOffgrid;
+	public OffGridGridBackRelaisDefect(ComponentManager manager, DecisionTableCondition condition, String outputSyncBridge, String meterId) {
+		super(manager, condition, outputSyncBridge,	meterId);
 	}
 
 	@Override
 	public IState getState() {
-		return OnOffGridState.OFF_GRID_MODE_WAIT_FOR_GRID_AVAILABLE;
+		return OnOffGridState.OFF_GRID_GRID_BACK_RELAIS_DEFECT;
 	}
 
 	@Override
@@ -33,31 +24,29 @@ public class WaitForGridAvailable extends BaseState {
 			return OnOffGridState.UNDEFINED;
 		}
 
-		if (DecisionTableHelper.isOffGridMode(condition)) {
-			return OnOffGridState.OFF_GRID_MODE;
+		if (DecisionTableHelper.isOnGrid(condition)) {
+			return OnOffGridState.ON_GRID;
 		}
 
-		if (DecisionTableHelper.isOffGridWaitForGridAvailable(condition)) {
-			return OnOffGridState.OFF_GRID_MODE_WAIT_FOR_GRID_AVAILABLE;
+		if (DecisionTableHelper.isStart(condition)) {
+			return OnOffGridState.START;
 		}
 
-		if (DecisionTableHelper.isAdjustParameters(condition)) {
-			return OnOffGridState.OFF_GRID_MODE_ADJUST_PARMETER;
+		if (DecisionTableHelper.isOffGridGridBackRelaisDefect(condition)) {
+			return OnOffGridState.OFF_GRID_GRID_BACK_RELAIS_DEFECT;
 		}
 
-		return OnOffGridState.OFF_GRID_MODE_WAIT_FOR_GRID_AVAILABLE;
+		return OnOffGridState.UNDEFINED;
 	}
 
 	@Override
 	public void act() throws OpenemsNamedException {
-		float factor = targetFrequencyOffgrid / GridconPcs.DEFAULT_GRID_FREQUENCY;
-		getGridconPcs().setF0(factor);
-		try {
-			getGridconPcs().doWriteTasks();
-		} catch (OpenemsNamedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		setSyncBridge(false);
+	}
+
+	@Override
+	public GridconSettings getGridconSettings() {
+		return GridconSettings.createStopSettings(Mode.VOLTAGE_CONTROL);
 	}
 
 }

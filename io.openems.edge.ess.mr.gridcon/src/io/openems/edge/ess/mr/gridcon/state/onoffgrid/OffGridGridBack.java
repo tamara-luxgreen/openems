@@ -3,24 +3,23 @@ package io.openems.edge.ess.mr.gridcon.state.onoffgrid;
 import io.openems.common.exceptions.OpenemsError.OpenemsNamedException;
 import io.openems.edge.common.component.ComponentManager;
 import io.openems.edge.ess.mr.gridcon.GridconPcs;
+import io.openems.edge.ess.mr.gridcon.GridconSettings;
 import io.openems.edge.ess.mr.gridcon.IState;
+import io.openems.edge.ess.mr.gridcon.enums.Mode;
 
 public class OffGridGridBack extends BaseState {
 
 	private float targetFrequencyOffgrid;
 
-	public OffGridGridBack(ComponentManager manager, DecisionTableCondition condition, String gridconPcsId, String b1Id,
-			String b2Id, String b3Id, String inputNa1, String inputNa2, String inputSyncBridge, String outputSyncBridge,
-			String meterId, float targetFrequencyOffgrid, boolean na1Inverted, boolean na2Inverted,
-			boolean inputSyncInverted) {
-		super(manager, condition, gridconPcsId, b1Id, b2Id, b3Id, inputNa1, inputNa2, inputSyncBridge, outputSyncBridge,
-				meterId, na1Inverted, na2Inverted);
+	public OffGridGridBack(ComponentManager manager, DecisionTableCondition condition, String outputSyncBridge,
+			String meterId, float targetFrequencyOffgrid) {
+		super(manager, condition, outputSyncBridge, meterId);
 		this.targetFrequencyOffgrid = targetFrequencyOffgrid;
 	}
 
 	@Override
 	public IState getState() {
-		return OnOffGridState.OFF_GRID_MODE_GRID_BACK;
+		return OnOffGridState.OFF_GRID_GRID_BACK;
 	}
 
 	@Override
@@ -30,31 +29,33 @@ public class OffGridGridBack extends BaseState {
 		}
 
 		if (DecisionTableHelper.isOffGridGridBack(condition)) {
-			return OnOffGridState.OFF_GRID_MODE_GRID_BACK;
+			return OnOffGridState.OFF_GRID_GRID_BACK;
 		}
 
-		if (DecisionTableHelper.isOffGridWaitForGridAvailable(condition)) {
-			return OnOffGridState.OFF_GRID_MODE_WAIT_FOR_GRID_AVAILABLE;
+		if (DecisionTableHelper.isOffGrid(condition)) {
+			return OnOffGridState.OFF_GRID;
 		}
 
-		if (DecisionTableHelper.isOffGridMode(condition)) {
-			return OnOffGridState.OFF_GRID_MODE;
+		if (DecisionTableHelper.isOffGridAdjustParameter(condition)) {
+			return OnOffGridState.OFF_GRID_ADJUST_PARMETER;
+		}
+		
+		if (DecisionTableHelper.isOffGridStart(condition)) {
+			return OnOffGridState.OFF_GRID_START;
 		}
 
-		return OnOffGridState.OFF_GRID_MODE_GRID_BACK;
+		return OnOffGridState.UNDEFINED;
 	}
 
 	@Override
 	public void act() throws OpenemsNamedException {
-		setSyncBridge(true);
+		setSyncBridge(true);		
+	}
+
+	@Override
+	public GridconSettings getGridconSettings() {
 		float factor = targetFrequencyOffgrid / GridconPcs.DEFAULT_GRID_FREQUENCY;
-		getGridconPcs().setF0(factor);
-		try {
-			getGridconPcs().doWriteTasks();
-		} catch (OpenemsNamedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		return GridconSettings.createRunningSettings(1, factor, Mode.VOLTAGE_CONTROL);
 	}
 
 }

@@ -27,6 +27,8 @@ import io.openems.edge.ess.api.ManagedSymmetricEss;
 import io.openems.edge.ess.api.SymmetricEss;
 import io.openems.edge.ess.mr.gridcon.enums.ErrorCodeChannelId0;
 import io.openems.edge.ess.mr.gridcon.enums.ErrorCodeChannelId1;
+import io.openems.edge.ess.mr.gridcon.state.gridconstate.GridconState;
+import io.openems.edge.ess.mr.gridcon.state.gridconstate.GridconStateObject;
 import io.openems.edge.ess.power.api.Constraint;
 import io.openems.edge.ess.power.api.Phase;
 import io.openems.edge.ess.power.api.Power;
@@ -44,7 +46,8 @@ public abstract class EssGridcon extends AbstractOpenemsComponent
 	String bmsCId;
 	private float offsetCurrent;
 
-	protected io.openems.edge.ess.mr.gridcon.StateObject stateObject = null;
+	protected io.openems.edge.ess.mr.gridcon.StateObject mainStateObject = null;
+	protected io.openems.edge.ess.mr.gridcon.state.gridconstate.GridconStateObject gridconStateObject = null;
 
 	protected abstract ComponentManager getComponentManager();
 
@@ -74,10 +77,15 @@ public abstract class EssGridcon extends AbstractOpenemsComponent
 		this.offsetCurrent = offsetCurrent;
 
 		initializeStateController(gridconId, bmsA, bmsB, bmsC);
-		stateObject = getFirstStateObjectUndefined();
+		mainStateObject = getFirstGeneralStateObjectUndefined();
+		gridconStateObject = getFirstGridconStateObjectUndefined();
 	}
 
-	protected abstract StateObject getFirstStateObjectUndefined();
+	private GridconStateObject getFirstGridconStateObjectUndefined() {
+		return StateController.getGridconStateObject(GridconState.UNDEFINED);
+	}
+
+	protected abstract StateObject getFirstGeneralStateObjectUndefined();
 
 	protected abstract void initializeStateController(String gridconPcs, String b1, String b2, String b3);
 
@@ -103,25 +111,33 @@ public abstract class EssGridcon extends AbstractOpenemsComponent
 				calculateAllowedPower();
 				calculateBatteryValues();
 
-				IState nextState = this.stateObject.getNextState();
-				StateObject nextStateObject = StateController.getStateObject(nextState);
+				
+				// Execute state machine for general handling				
+				IState nextMainState = this.mainStateObject.getNextState();
+				StateObject nextMainStateObject = StateController.getGeneralStateObject(nextMainState);
 
-				// do not set the state undefined as state before
-				// state before is only necessary (at the moment) to decide what the next
-				// state is coming from undefined
-				if (!this.stateObject.getState().toString().toUpperCase().contains("UNDEFINED")) {
-					nextStateObject.setStateBefore(this.stateObject.getState());
-				}
-
-				System.out.println("  ----- CURRENT STATE:" + this.stateObject.getState().getName());
-				System.out.println("  ----- NEXT STATE:" + nextStateObject.getState().getName());
+				System.out.println("  ----- CURRENT STATE:" + this.mainStateObject.getState().getName());
+				System.out.println("  ----- NEXT STATE:" + nextMainStateObject.getState().getName());
 				System.out.println("Conditional: ");
 				StateController.printCondition();
 
-				this.stateObject = nextStateObject;
+				this.mainStateObject = nextMainStateObject;
 
-				this.stateObject.act();
+				this.mainStateObject.act();
+				
+				// Execute state machine for gridcon handling, parameters for the grid settings coming from the state machine object
+				GridconSettings gridconSettings = this.mainStateObject.getGridconSettings();
+				
+				
+				IState nextGridconState = this.gridconStateObject.getNextState();
+				GridconStateObject nextGridconStateObject = StateController.getGridconStateObject(nextGridconState);				
+				this.gridconStateObject = nextGridconStateObject;
+				this.gridconStateObject.act(gridconSettings);
+				
+				
+				
 				this.writeStateMachineToChannel();
+				
 			} catch (IllegalArgumentException | OpenemsNamedException e) {
 				logError(log, "Error: " + e.getMessage());
 			}
@@ -287,8 +303,8 @@ public abstract class EssGridcon extends AbstractOpenemsComponent
 
 	@Override
 	public String debugLog() {
-		return "StateObject: " + stateObject.getState().getName() + "| Next StateObject: "
-				+ stateObject.getNextState().getName();
+		return "StateObject: " + mainStateObject.getState().getName() + "| Next StateObject: "
+				+ mainStateObject.getNextState().getName();
 	}
 
 	/**

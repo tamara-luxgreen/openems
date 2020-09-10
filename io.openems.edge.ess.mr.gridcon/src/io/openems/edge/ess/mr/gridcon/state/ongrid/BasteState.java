@@ -1,31 +1,12 @@
 package io.openems.edge.ess.mr.gridcon.state.ongrid;
 
-import io.openems.edge.ess.mr.gridcon.IState;
 import io.openems.edge.ess.mr.gridcon.StateObject;
 
 public abstract class BasteState implements StateObject {
 
-	private StateObject subStateObject;
+	//TODO das System besteht nicht nur aus dem Gridccon, sondern es ist auch noch ein relais mit dabei, sollte man das bedenken...!?
+	
+	
 
-	@Override
-	public IState getStateBefore() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setStateBefore(IState stateBefore) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void setSubStateObject(StateObject subStateObject) {
-		this.subStateObject = subStateObject;
-	}
-
-	@Override
-	public StateObject getSubStateObject() {
-		return subStateObject;
-	}
 
 }

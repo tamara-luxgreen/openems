@@ -9,14 +9,12 @@ public interface DecisionTableCondition {
 
 	NaProtection2On isNaProtection2On() throws Exception;
 
-	GridconCommunicationFailed isGridconCommunicationFailed() throws Exception;
-
 	MeterCommunicationFailed isMeterCommunicationFailed() throws Exception;
 
 	VoltageInRange isVoltageInRange() throws Exception;
 
 	SyncBridgeOn isSyncBridgeOn() throws Exception;
-
+	
 	enum NaProtection1On {
 
 		TRUE(true), FALSE(false), UNSET(null);
@@ -39,21 +37,6 @@ public interface DecisionTableCondition {
 		private Boolean value;
 
 		private NaProtection2On(Boolean value) {
-			this.value = value;
-		}
-
-		public Boolean getValue() {
-			return value;
-		}
-	}
-
-	enum GridconCommunicationFailed {
-
-		TRUE(true), FALSE(false), UNSET(null);
-
-		private Boolean value;
-
-		private GridconCommunicationFailed(Boolean value) {
 			this.value = value;
 		}
 
@@ -106,4 +89,5 @@ public interface DecisionTableCondition {
 			return value;
 		}
 	}
+
 }

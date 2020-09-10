@@ -33,7 +33,9 @@ public class Creator {
 	public static final float TARGET_FREQUENCY_OFFGRID = 50.6f;
 	public static final float DELTA_FREQUENCY = 0.2f;
 	public static final float DELTA_VOLTAGE = 5.0f;
-
+	public static final int TIME_SECONDS_TO_WAIT_FOR_JANITZA = 2;
+	public static final int TIME_SECONDS_TO_WAIT_SWITCH_OFF_SYNC_BRIDGE = 1;
+	
 	public static DummyComponentManager getDummyComponentManager() {
 		return new DummyComponentManager();
 	}

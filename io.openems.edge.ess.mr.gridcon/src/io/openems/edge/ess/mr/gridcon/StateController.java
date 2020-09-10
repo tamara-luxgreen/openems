@@ -5,12 +5,13 @@ import java.util.Map;
 
 import io.openems.edge.common.component.ComponentManager;
 import io.openems.edge.ess.mr.gridcon.enums.ParameterSet;
+import io.openems.edge.ess.mr.gridcon.state.gridconstate.GridconStateObject;
 import io.openems.edge.ess.mr.gridcon.state.onoffgrid.DecisionTableCondition;
-import io.openems.edge.ess.mr.gridcon.state.onoffgrid.OnGrid;
 
 public class StateController {
 
-	private static Map<IState, StateObject> stateObjects;
+	private static Map<IState, StateObject> generalStateObjects;
+	private static Map<IState, GridconStateObject> gridconStateObjects;
 
 	private static DecisionTableCondition condition;
 
@@ -27,32 +28,36 @@ public class StateController {
 			String hardRestartRelayAdress, //
 			float offsetCurrent) {
 
-		stateObjects = new HashMap<IState, StateObject>();
+		generalStateObjects = new HashMap<IState, StateObject>();
+		gridconStateObjects = new HashMap<IState, GridconStateObject>();
 
-		stateObjects.put(io.openems.edge.ess.mr.gridcon.state.gridconstate.GridconState.STOPPED,
+
+		gridconStateObjects.put(io.openems.edge.ess.mr.gridcon.state.gridconstate.GridconState.STOPPED,
 				new io.openems.edge.ess.mr.gridcon.state.gridconstate.Stopped(manager, gridconPcs, b1, b2, b3,
 						enableI1, enableI2, enableI3, parameterSet, hardRestartRelayAdress));
-		stateObjects.put(io.openems.edge.ess.mr.gridcon.state.gridconstate.GridconState.RUN,
+		gridconStateObjects.put(io.openems.edge.ess.mr.gridcon.state.gridconstate.GridconState.RUN,
 				new io.openems.edge.ess.mr.gridcon.state.gridconstate.Run(manager, gridconPcs, b1, b2, b3, enableI1,
 						enableI2, enableI3, parameterSet, hardRestartRelayAdress, offsetCurrent));
-		StateObject gridconUndefined = new io.openems.edge.ess.mr.gridcon.state.gridconstate.Undefined(manager,
-				gridconPcs, b1, b2, b3, hardRestartRelayAdress);
-		stateObjects.put(io.openems.edge.ess.mr.gridcon.state.gridconstate.GridconState.UNDEFINED, gridconUndefined);
-		stateObjects.put(io.openems.edge.ess.mr.gridcon.state.gridconstate.GridconState.ERROR,
+		gridconStateObjects.put(io.openems.edge.ess.mr.gridcon.state.gridconstate.GridconState.UNDEFINED, 
+				new io.openems.edge.ess.mr.gridcon.state.gridconstate.Undefined(manager, gridconPcs, b1, b2, b3, hardRestartRelayAdress));
+		gridconStateObjects.put(io.openems.edge.ess.mr.gridcon.state.gridconstate.GridconState.ERROR,
 				new io.openems.edge.ess.mr.gridcon.state.gridconstate.Error(manager, gridconPcs, b1, b2, b3, enableI1,
 						enableI2, enableI3, parameterSet, hardRestartRelayAdress));
 
-		stateObjects.put(io.openems.edge.ess.mr.gridcon.state.ongrid.OnGridState.UNDEFINED,
+		generalStateObjects.put(io.openems.edge.ess.mr.gridcon.state.ongrid.OnGridState.UNDEFINED,
 				new io.openems.edge.ess.mr.gridcon.state.ongrid.Undefined());
-		stateObjects.put(io.openems.edge.ess.mr.gridcon.state.ongrid.OnGridState.ERROR,
+		generalStateObjects.put(io.openems.edge.ess.mr.gridcon.state.ongrid.OnGridState.ERROR,
 				new io.openems.edge.ess.mr.gridcon.state.ongrid.Error());
-		StateObject onGridStateObject = new io.openems.edge.ess.mr.gridcon.state.ongrid.OnGrid();
-		onGridStateObject.setSubStateObject(gridconUndefined);
-		stateObjects.put(io.openems.edge.ess.mr.gridcon.state.ongrid.OnGridState.ONGRID, onGridStateObject);
+		generalStateObjects.put(io.openems.edge.ess.mr.gridcon.state.ongrid.OnGridState.ONGRID, 
+				new io.openems.edge.ess.mr.gridcon.state.ongrid.OnGrid());
 	}
 
-	public static StateObject getStateObject(IState state) {
-		return stateObjects.get(state);
+	public static StateObject getGeneralStateObject(IState state) {
+		return generalStateObjects.get(state);
+	}
+	
+	public static GridconStateObject getGridconStateObject(IState state) {
+		return gridconStateObjects.get(state);
 	}
 
 	public static void initDecisionTableCondition(DecisionTableCondition tableCondition) {
@@ -68,66 +73,64 @@ public class StateController {
 			float deltaVoltage, //
 			float offsetCurrent) {
 
-		System.out.println("INIT state controller: offset current is: " + offsetCurrent);
+		generalStateObjects = new HashMap<IState, StateObject>();
+		gridconStateObjects = new HashMap<IState, GridconStateObject>();
 
-		stateObjects = new HashMap<IState, StateObject>();
 
+		int time_to_wait = 123;
+		int timeToWaitForSyncBridge = 10;
+		
 		// State objects for gridcon in ongrid mode
-		stateObjects.put(io.openems.edge.ess.mr.gridcon.state.gridconstate.GridconState.STOPPED,
+		gridconStateObjects.put(io.openems.edge.ess.mr.gridcon.state.gridconstate.GridconState.STOPPED,
 				new io.openems.edge.ess.mr.gridcon.state.gridconstate.Stopped(manager, gridconPcs, b1, b2, b3,
 						enableIpu1, enableIpu2, enableIpu3, parameterSet, outputHardReset));
-		stateObjects.put(io.openems.edge.ess.mr.gridcon.state.gridconstate.GridconState.RUN,
+		gridconStateObjects.put(io.openems.edge.ess.mr.gridcon.state.gridconstate.GridconState.RUN,
 				new io.openems.edge.ess.mr.gridcon.state.gridconstate.Run(manager, gridconPcs, b1, b2, b3, enableIpu1,
 						enableIpu2, enableIpu3, parameterSet, outputHardReset, offsetCurrent));
-		StateObject gridconUndefined = new io.openems.edge.ess.mr.gridcon.state.gridconstate.Undefined(manager,
-				gridconPcs, b1, b2, b3, outputHardReset);
-		stateObjects.put(io.openems.edge.ess.mr.gridcon.state.gridconstate.GridconState.UNDEFINED, gridconUndefined);
-		stateObjects.put(io.openems.edge.ess.mr.gridcon.state.gridconstate.GridconState.ERROR,
+		gridconStateObjects.put(io.openems.edge.ess.mr.gridcon.state.gridconstate.GridconState.UNDEFINED, 
+				new io.openems.edge.ess.mr.gridcon.state.gridconstate.Undefined(manager,
+				gridconPcs, b1, b2, b3, outputHardReset));
+		gridconStateObjects.put(io.openems.edge.ess.mr.gridcon.state.gridconstate.GridconState.ERROR,
 				new io.openems.edge.ess.mr.gridcon.state.gridconstate.Error(manager, gridconPcs, b1, b2, b3, enableIpu1,
 						enableIpu2, enableIpu3, parameterSet, outputHardReset));
 
-		stateObjects.put(io.openems.edge.ess.mr.gridcon.state.onoffgrid.OnOffGridState.UNDEFINED,
-				new io.openems.edge.ess.mr.gridcon.state.onoffgrid.Undefined(manager, condition, gridconPcs, b1, b2, b3,
-						inputNaProtection1, inputNaProtection2, inputSyncDeviceBridge, outputSyncDeviceBridge, meterId,
-						na1Inverted, na2Inverted, inputSyncDeviceBridgeInverted));
-		stateObjects.put(io.openems.edge.ess.mr.gridcon.state.onoffgrid.OnOffGridState.START_SYSTEM,
-				new io.openems.edge.ess.mr.gridcon.state.onoffgrid.StartSystem(manager, condition, gridconPcs, b1, b2,
-						b3, inputNaProtection1, inputNaProtection2, inputSyncDeviceBridge, outputSyncDeviceBridge,
-						meterId, na1Inverted, na2Inverted, inputSyncDeviceBridgeInverted));
-		stateObjects.put(io.openems.edge.ess.mr.gridcon.state.onoffgrid.OnOffGridState.WAIT_FOR_DEVICES,
-				new io.openems.edge.ess.mr.gridcon.state.onoffgrid.WaitForDevices(manager, condition, gridconPcs, b1,
-						b2, b3, inputNaProtection1, inputNaProtection2, inputSyncDeviceBridge, outputSyncDeviceBridge,
-						meterId, na1Inverted, na2Inverted, inputSyncDeviceBridgeInverted));
+		generalStateObjects.put(io.openems.edge.ess.mr.gridcon.state.onoffgrid.OnOffGridState.UNDEFINED,
+				new io.openems.edge.ess.mr.gridcon.state.onoffgrid.Undefined(manager, condition, outputSyncDeviceBridge, meterId));
+		
+		generalStateObjects.put(io.openems.edge.ess.mr.gridcon.state.onoffgrid.OnOffGridState.START,
+				new io.openems.edge.ess.mr.gridcon.state.onoffgrid.Start(manager, condition, outputSyncDeviceBridge,
+						meterId, time_to_wait));
+		
+		generalStateObjects.put(io.openems.edge.ess.mr.gridcon.state.onoffgrid.OnOffGridState.ON_GRID, 
+				new io.openems.edge.ess.mr.gridcon.state.onoffgrid.OnGrid(manager, condition, outputSyncDeviceBridge, meterId, targetFrequencyOnGrid));
+		
+		generalStateObjects.put(io.openems.edge.ess.mr.gridcon.state.onoffgrid.OnOffGridState.OFF_GRID,
+				new io.openems.edge.ess.mr.gridcon.state.onoffgrid.OffGrid(manager, condition, outputSyncDeviceBridge, meterId,
+						targetFrequencyOffGrid));
+		
+		generalStateObjects.put(io.openems.edge.ess.mr.gridcon.state.onoffgrid.OnOffGridState.OFF_GRID_START,
+				new io.openems.edge.ess.mr.gridcon.state.onoffgrid.OffGridStart(manager, condition, outputSyncDeviceBridge,
+						meterId, targetFrequencyOffGrid));
+				
+		generalStateObjects.put(io.openems.edge.ess.mr.gridcon.state.onoffgrid.OnOffGridState.OFF_GRID_GRID_BACK,
+				new io.openems.edge.ess.mr.gridcon.state.onoffgrid.OffGridGridBack(manager, condition, outputSyncDeviceBridge,
+						meterId, targetFrequencyOffGrid));
+		
+		generalStateObjects.put(io.openems.edge.ess.mr.gridcon.state.onoffgrid.OnOffGridState.OFF_GRID_GRID_BACK_RELAIS_DEFECT,
+				new io.openems.edge.ess.mr.gridcon.state.onoffgrid.OffGridGridBackRelaisDefect(manager, condition, outputSyncDeviceBridge, meterId));
 
-		OnGrid onGrid = new io.openems.edge.ess.mr.gridcon.state.onoffgrid.OnGrid(manager, condition, gridconPcs, b1,
-				b2, b3, inputNaProtection1, inputNaProtection2, inputSyncDeviceBridge, outputSyncDeviceBridge, meterId,
-				targetFrequencyOnGrid, na1Inverted, na2Inverted, inputSyncDeviceBridgeInverted);
-		onGrid.setSubStateObject(gridconUndefined);
-		stateObjects.put(io.openems.edge.ess.mr.gridcon.state.onoffgrid.OnOffGridState.ON_GRID_MODE, onGrid);
-
-		stateObjects.put(io.openems.edge.ess.mr.gridcon.state.onoffgrid.OnOffGridState.OFF_GRID_MODE,
-				new io.openems.edge.ess.mr.gridcon.state.onoffgrid.OffGrid(manager, condition, gridconPcs, b1, b2, b3,
-						inputNaProtection1, inputNaProtection2, inputSyncDeviceBridge, outputSyncDeviceBridge, meterId,
-						targetFrequencyOffGrid, na1Inverted, na2Inverted, inputSyncDeviceBridgeInverted));
-		stateObjects.put(io.openems.edge.ess.mr.gridcon.state.onoffgrid.OnOffGridState.OFF_GRID_MODE_GRID_BACK,
-				new io.openems.edge.ess.mr.gridcon.state.onoffgrid.OffGridGridBack(manager, condition, gridconPcs, b1,
-						b2, b3, inputNaProtection1, inputNaProtection2, inputSyncDeviceBridge, outputSyncDeviceBridge,
-						meterId, targetFrequencyOffGrid, na1Inverted, na2Inverted, inputSyncDeviceBridgeInverted));
-		stateObjects.put(
-				io.openems.edge.ess.mr.gridcon.state.onoffgrid.OnOffGridState.OFF_GRID_MODE_WAIT_FOR_GRID_AVAILABLE,
-				new io.openems.edge.ess.mr.gridcon.state.onoffgrid.WaitForGridAvailable(manager, condition, gridconPcs,
-						b1, b2, b3, inputNaProtection1, inputNaProtection2, inputSyncDeviceBridge,
-						outputSyncDeviceBridge, meterId, targetFrequencyOffGrid, na1Inverted, na2Inverted,
-						inputSyncDeviceBridgeInverted));
-		stateObjects.put(io.openems.edge.ess.mr.gridcon.state.onoffgrid.OnOffGridState.OFF_GRID_MODE_ADJUST_PARMETER,
-				new io.openems.edge.ess.mr.gridcon.state.onoffgrid.AdjustParameter(manager, condition, gridconPcs, b1,
-						b2, b3, inputNaProtection1, inputNaProtection2, inputSyncDeviceBridge, outputSyncDeviceBridge,
-						meterId, deltaFrequency, deltaVoltage, na1Inverted, na2Inverted,
-						inputSyncDeviceBridgeInverted));
+		generalStateObjects.put(io.openems.edge.ess.mr.gridcon.state.onoffgrid.OnOffGridState.OFF_GRID_ADJUST_PARMETER,
+				new io.openems.edge.ess.mr.gridcon.state.onoffgrid.OffGridAdjustParameter(manager, condition, outputSyncDeviceBridge,
+						meterId, deltaFrequency, deltaVoltage));
+		
+		generalStateObjects.put(
+				io.openems.edge.ess.mr.gridcon.state.onoffgrid.OnOffGridState.OFF_GRID_GRID_BACK_INVERTER_OFF,
+				new io.openems.edge.ess.mr.gridcon.state.onoffgrid.OffGridGridBackInverterOff(manager, condition, outputSyncDeviceBridge, meterId, timeToWaitForSyncBridge ));
 	}
 
 	public static void printCondition() {
 		System.out.println("condition: \n" + condition);
 	}
 
+	
 }

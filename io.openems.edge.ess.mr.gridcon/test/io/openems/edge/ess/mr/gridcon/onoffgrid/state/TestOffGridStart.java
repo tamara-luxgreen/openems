@@ -21,19 +21,19 @@ import io.openems.edge.ess.mr.gridcon.state.onoffgrid.DecisionTableCondition.NaP
 import io.openems.edge.ess.mr.gridcon.state.onoffgrid.DecisionTableCondition.NaProtection2On;
 import io.openems.edge.ess.mr.gridcon.state.onoffgrid.DecisionTableCondition.SyncBridgeOn;
 import io.openems.edge.ess.mr.gridcon.state.onoffgrid.DecisionTableCondition.VoltageInRange;
-import io.openems.edge.ess.mr.gridcon.state.onoffgrid.OffGridGridBack;
+import io.openems.edge.ess.mr.gridcon.state.onoffgrid.OffGridStart;
 import io.openems.edge.ess.mr.gridcon.state.onoffgrid.OnOffGridState;
 
-public class TestOffGridGridBack {
+public class TestOffGridStart {
 
-	private OffGridGridBack sut;
+	private OffGridStart sut;
 	private DummyComponentManager manager = Creator.getDummyComponentManager();
 	private static DummyDecisionTableCondition condition;
 		
 	@Before
 	public void setUp() throws Exception {
 		condition = new DummyDecisionTableCondition(NaProtection1On.TRUE, NaProtection2On.TRUE, MeterCommunicationFailed.TRUE, VoltageInRange.TRUE, SyncBridgeOn.TRUE);
-		sut = new OffGridGridBack(//
+		sut = new OffGridStart(//
 				manager  
 				, condition//
 				, Creator.OUTPUT_SYNC_DEVICE_BRIDGE//
@@ -44,7 +44,7 @@ public class TestOffGridGridBack {
 
 	@Test
 	public final void testGetState() {
-		assertEquals(OnOffGridState.OFF_GRID_GRID_BACK, sut.getState());
+		assertEquals(OnOffGridState.OFF_GRID_START, sut.getState());
 	}
 		
 	@Test
@@ -61,35 +61,18 @@ public class TestOffGridGridBack {
 	}
 	
 	@Test
-	public void testGetNextStateOffGridGridBack() {
-		// According to the state machine the next state is "OFF GRID GRID BACK" if condition is 0,0,0,1,1
-		setCondition(NaProtection1On.FALSE, NaProtection2On.FALSE, MeterCommunicationFailed.FALSE, VoltageInRange.TRUE, SyncBridgeOn.TRUE);
-		assertEquals(OnOffGridState.OFF_GRID_GRID_BACK, sut.getNextState());
+	public void testGetNextStateOffGridGridBackInverterOff() {
+		// According to the state machine the next state is "OFF GRID GRID BACK INVERTER OFF" if condition is 1,0,1,-,1
+		setCondition(NaProtection1On.TRUE, NaProtection2On.FALSE, MeterCommunicationFailed.TRUE, VoltageInRange.TRUE, SyncBridgeOn.TRUE);
+		assertEquals(OnOffGridState.OFF_GRID_GRID_BACK_INVERTER_OFF, sut.getNextState());
 		
+		setCondition(NaProtection1On.TRUE, NaProtection2On.FALSE, MeterCommunicationFailed.TRUE, VoltageInRange.FALSE, SyncBridgeOn.TRUE);
+		assertEquals(OnOffGridState.OFF_GRID_GRID_BACK_INVERTER_OFF, sut.getNextState());
+		
+		setCondition(NaProtection1On.TRUE, NaProtection2On.FALSE, MeterCommunicationFailed.TRUE, VoltageInRange.UNSET, SyncBridgeOn.TRUE);
+		assertEquals(OnOffGridState.OFF_GRID_GRID_BACK_INVERTER_OFF, sut.getNextState());
 	}
 	
-	@Test
-	public void testGetNextStateOffGridAdjustParameter() {
-		// According to the state machine the next state is "OFF GRID ADJUST PARAMETER" if condition is 1,0,0,1,1
-		setCondition(NaProtection1On.TRUE, NaProtection2On.FALSE, MeterCommunicationFailed.FALSE, VoltageInRange.TRUE, SyncBridgeOn.TRUE);
-		assertEquals(OnOffGridState.OFF_GRID_ADJUST_PARMETER, sut.getNextState());
-		
-	}
-
-	@Test
-	public void testGetNextStateOffGridStart() {
-		// According to the state machine the next state is "OFF GRID START" if condition is 0,0,1,-,1
-		setCondition(NaProtection1On.FALSE, NaProtection2On.FALSE, MeterCommunicationFailed.TRUE, VoltageInRange.TRUE, SyncBridgeOn.TRUE);
-		assertEquals(OnOffGridState.OFF_GRID_START, sut.getNextState());
-		
-		setCondition(NaProtection1On.FALSE, NaProtection2On.FALSE, MeterCommunicationFailed.TRUE, VoltageInRange.FALSE, SyncBridgeOn.TRUE);
-		assertEquals(OnOffGridState.OFF_GRID_START, sut.getNextState());
-		
-		setCondition(NaProtection1On.FALSE, NaProtection2On.FALSE, MeterCommunicationFailed.TRUE, VoltageInRange.UNSET, SyncBridgeOn.TRUE);
-		assertEquals(OnOffGridState.OFF_GRID_START, sut.getNextState());
-		
-	}
-		
 	@Test
 	public void testAct() {
 		// frequency preset for gridcon 50,6 Hz, Voltage control mode; sync bridge true

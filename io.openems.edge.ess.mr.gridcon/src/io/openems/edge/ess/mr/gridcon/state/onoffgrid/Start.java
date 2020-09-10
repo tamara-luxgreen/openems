@@ -1,45 +1,69 @@
 package io.openems.edge.ess.mr.gridcon.state.onoffgrid;
 
+import java.time.LocalDateTime;
+
 import io.openems.common.exceptions.OpenemsError.OpenemsNamedException;
 import io.openems.edge.common.component.ComponentManager;
+import io.openems.edge.ess.mr.gridcon.GridconSettings;
 import io.openems.edge.ess.mr.gridcon.IState;
 import io.openems.edge.ess.mr.gridcon.StateObject;
+import io.openems.edge.ess.mr.gridcon.enums.Mode;
 
-public class StartSystem extends BaseState implements StateObject {
 
-	public StartSystem(ComponentManager manager, DecisionTableCondition condition, String gridconPcsId, String b1Id,
-			String b2Id, String b3Id, String inputNa1, String inputNa2, String inputSyncBridge, String outputSyncBridge,
-			String meterId, boolean na1Inverted, boolean na2Inverted, boolean inputSyncInverted) {
-		super(manager, condition, gridconPcsId, b1Id, b2Id, b3Id, inputNa1, inputNa2, inputSyncBridge, outputSyncBridge,
-				meterId, na1Inverted, na2Inverted);
+public class Start extends BaseState implements StateObject {
+
+	private int timeSecondsToWaitForJanitza = 100;
+	private LocalDateTime lastMethodCall;
+
+	public Start(ComponentManager manager, DecisionTableCondition condition, String outputSyncBridge,
+			String meterId, int timeSecondsToWaitForJanitza) {
+		super(manager, condition, outputSyncBridge, meterId);
+		this.timeSecondsToWaitForJanitza = timeSecondsToWaitForJanitza;
 	}
 
 	@Override
 	public IState getState() {
-		return OnOffGridState.START_SYSTEM;
+		return OnOffGridState.START;
 	}
 
 	@Override
 	public IState getNextState() {
+		OnOffGridState stateToReturn = OnOffGridState.START;//UNDEF?!
+		
+		if (lastMethodCall == null) {
+			lastMethodCall = LocalDateTime.now();
+		}
+		
+		LocalDateTime now = LocalDateTime.now();
 
-		if (DecisionTableHelper.isWaitingForDevices(condition)) {
-			return OnOffGridState.WAIT_FOR_DEVICES;
+		if (DecisionTableHelper.isOnGrid(condition)) {
+			stateToReturn = OnOffGridState.ON_GRID;
 		}
 
-		if (DecisionTableHelper.isError(condition)) {
-			return OnOffGridState.ERROR;
+		if (lastMethodCall.plusSeconds(timeSecondsToWaitForJanitza).isBefore(now))
+			if (DecisionTableHelper.isOffGridStart(condition)) {
+				stateToReturn = OnOffGridState.OFF_GRID_START;
 		}
 
 		if (DecisionTableHelper.isUndefined(condition)) {
-			return OnOffGridState.UNDEFINED;
+			stateToReturn = OnOffGridState.UNDEFINED;
 		}
-
-		return OnOffGridState.START_SYSTEM;
+		
+		if (stateToReturn != OnOffGridState.START) {
+			lastMethodCall = null;
+		}
+		
+		return stateToReturn;
 	}
 
 	@Override
 	public void act() throws OpenemsNamedException {
-		setSyncBridge(false);
+		setSyncBridge(true);
+	}
+
+	@Override
+	public GridconSettings getGridconSettings() {
+		return GridconSettings.createStopSettings(Mode.VOLTAGE_CONTROL);
 	}
 
 }

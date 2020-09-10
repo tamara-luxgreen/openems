@@ -5,12 +5,18 @@ import io.openems.edge.ess.mr.gridcon.IState;
 
 public enum OnOffGridState implements IState {
 	UNDEFINED(-1, "Undefined"), //
-	START_SYSTEM(100, "Start System"), //
-	WAIT_FOR_DEVICES(101, "Waiting until devices are online"), ON_GRID_MODE(102, "On Grid Mode"),
-	OFF_GRID_MODE(200, "Off Grid Mode"), OFF_GRID_MODE_GRID_BACK(201, "Off Grid Mode - Grid is back"),
-	OFF_GRID_MODE_WAIT_FOR_GRID_AVAILABLE(202, "Off Grid Mode - Grid is back"),
-	OFF_GRID_MODE_ADJUST_PARMETER(203, "Off Grid Mode - Adjust Parameter for Synchronisation"),
-	ERROR(300, "Error");
+
+	START(100, "Start"), //
+	
+	ON_GRID(201, "On Grid"), //
+	
+	OFF_GRID_START(300, "Off Grid Start"), //
+	OFF_GRID(301, "Off Grid"), //
+	OFF_GRID_GRID_BACK(302, "Off Grid Grid back"), //
+	OFF_GRID_ADJUST_PARMETER(303, "Off Grid Adjust Parameter"), //
+	OFF_GRID_GRID_BACK_RELAIS_DEFECT(304, "Off Grid Grid Back Relais Defect"), //
+	OFF_GRID_GRID_BACK_INVERTER_OFF(305, "Off Grid Grid Back Inverter Off"), //
+	; //
 
 	private final int value;
 	private final String name;

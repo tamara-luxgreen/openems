@@ -1,180 +1,160 @@
 package io.openems.edge.ess.mr.gridcon.state.onoffgrid;
 
-import java.time.LocalDateTime;
-import java.util.BitSet;
-
 import io.openems.common.exceptions.OpenemsError.OpenemsNamedException;
 import io.openems.common.types.ChannelAddress;
-import io.openems.edge.battery.soltaro.SoltaroBattery;
-import io.openems.edge.common.channel.BooleanReadChannel;
 import io.openems.edge.common.channel.BooleanWriteChannel;
 import io.openems.edge.common.channel.Channel;
-import io.openems.edge.common.channel.value.Value;
 import io.openems.edge.common.component.ComponentManager;
-import io.openems.edge.ess.mr.gridcon.GridconPcs;
-import io.openems.edge.ess.mr.gridcon.IState;
 import io.openems.edge.ess.mr.gridcon.StateObject;
-import io.openems.edge.ess.mr.gridcon.WeightingHelper;
 import io.openems.edge.meter.api.SymmetricMeter;
 
 public abstract class BaseState implements StateObject {
 
-	private static final int VOLTAGE_GRID = 200_000;
+//	private static final int VOLTAGE_GRID_MILLIVOLT = 200_000;
 	public static final float ONOFF_GRID_VOLTAGE_FACTOR = 1;
 	public static final float ONOFF_GRID_FREQUENCY_FACTOR_ONLY_ONGRID = 1.054f;
 
 	private ComponentManager manager;
-	private String gridconPcsId;
-	private String battery1Id;
-	private String battery2Id;
-	private String battery3Id;
-	private String inputNA1;
-	private boolean na1Inverted;
-	private String inputNA2;
-	private boolean na2Inverted;
-	private String inputSyncBridge;
 	private String outputSyncBridge;
 	private String meterId;
-	private IState stateBefore;
-	protected DecisionTableCondition condition; // TODO besser wÃ¤re es die Methode IState getNextState(); so zu deklarieren
-	private StateObject subStateObject;
-	// IState getNextState(DecisionTableCondition condition), das erfordert aber ein
-	// anderes Handling der states....
-	// was nur konsequent ist, da on grid states und off grid states aktuell nicht
-	// konsistent sind...
-	// Die aktuelle state machine fÃ¼r den ongrid state ist eigtl eine "unter state
-	// machine der gesamt state machine und bildet nur den on grid betrieb ab
+	protected DecisionTableCondition condition;
 
-	public BaseState(ComponentManager manager, DecisionTableCondition condition, String gridconPcsId, String b1Id,
-			String b2Id, String b3Id, String inputNA1, String inputNA2, String inputSyncBridge, String outputSyncBridge,
-			String meterId, boolean na1Inverted, boolean na2Inverted) {
+	public BaseState(ComponentManager manager, DecisionTableCondition condition, String outputSyncBridge,
+			String meterId) {
 		this.manager = manager;
-		this.gridconPcsId = gridconPcsId;
-		this.battery1Id = b1Id;
-		this.battery2Id = b2Id;
-		this.battery3Id = b3Id;
-		this.inputNA1 = inputNA1;
-		this.inputNA2 = inputNA2;
-		this.inputSyncBridge = inputSyncBridge;
 		this.outputSyncBridge = outputSyncBridge;
 		this.meterId = meterId;
 		this.condition = condition;
-		this.na1Inverted = na1Inverted;
-		this.na2Inverted = na2Inverted;
 	}
+	
+//	@Override
+//	public IState getNextState() {
+//			if (DecisionTableHelper.isUndefined(condition)) {
+//				return OnOffGridState.UNDEFINED;
+//			}
+//
+//			if (DecisionTableHelper.isOnGridStart(condition)) {
+//				return OnOffGridState.ON_GRID_START;
+//			}
+//
+//			if (DecisionTableHelper.isOnGrid(condition)) {
+//				return OnOffGridState.ON_GRID;
+//			}
+//			
+//			if (DecisionTableHelper.isOffGridStart(condition)) {
+//				return OnOffGridState.OFF_GRID_START;
+//			}
+//
+//			if (DecisionTableHelper.isOffGrid(condition)) {
+//				return OnOffGridState.OFF_GRID;
+//			}
+//			
+//			if (DecisionTableHelper.isOffGridGridBack(condition)) {
+//				return OnOffGridState.OFF_GRID_GRID_BACK;
+//			}
+//			
+//			if (DecisionTableHelper.isOffGridAdjustParameter(condition)) {
+//				return OnOffGridState.OFF_GRID_ADJUST_PARMETER;
+//			}
+//			
+//			if (DecisionTableHelper.isOffGridGridBackRelaisDefect(condition)) {
+//				return OnOffGridState.OFF_GRID_GRID_BACK_RELAIS_DEFECT;
+//			}
+//			
+//			return OnOffGridState.UNDEFINED;
+//	}
 
-	protected boolean isNextStateUndefined() {
-		return !isGridconDefined() || !isAtLeastOneBatteryDefined() || !isDigitalInputsDefined();
-	}
 
-	private boolean isDigitalInputsDefined() {
-		boolean defined = true;
 
-		defined = defined && isDigitalInputDefined(inputNA1);
-		defined = defined && isDigitalInputDefined(inputNA2);
-		defined = defined && isDigitalInputDefined(inputSyncBridge);
-
-		return defined;
-	}
-
-	private boolean isDigitalInputDefined(String inputAddress) {
-		boolean defined = false;
-		try {
-			BooleanReadChannel inputChannel = getBooleanReadChannel(inputAddress);
-			defined = isValueDefined(inputChannel.value());
-		} catch (Exception e) {
-			defined = false;
-		}
-		return defined;
-	}
-
-	private boolean isValueDefined(Value<Boolean> value) {
-		if (value != null) {
-			return value.isDefined();
-		}
-		return false;
-	}
-
-	private BooleanReadChannel getBooleanReadChannel(String channelAddress)
-			throws IllegalArgumentException, OpenemsNamedException {
-		return this.manager.getChannel(ChannelAddress.fromString(channelAddress));
-	}
-
-	private boolean isAtLeastOneBatteryDefined() {
-		boolean undefined = true;
-
-		if (getBattery1() != null) {
-			undefined = undefined && getBattery1().isUndefined();
-		}
-		if (getBattery2() != null) {
-			undefined = undefined && getBattery2().isUndefined();
-		}
-		if (getBattery3() != null) {
-			undefined = undefined && getBattery3().isUndefined();
-		}
-
-		return !undefined;
-	}
-
-	private boolean isGridconDefined() {
-		// TODO when is it defined
-		return true;
-	}
-
-	protected boolean isNextStateError() {
-		if (getGridconPcs() != null && getGridconPcs().isError()) {
-			return true;
-		}
-
-		if (getBattery1() != null && getBattery1().isError()) {
-			return true;
-		}
-
-		if (getBattery2() != null && getBattery2().isError()) {
-			return true;
-		}
-
-		if (getBattery3() != null && getBattery3().isError()) {
-			return true;
-		}
-
-		return false;
-	}
-
-	protected boolean isNextStateOnGridStopped() {
-		return isSystemOngrid() && getGridconPcs() != null && getGridconPcs().isStopped();
-	}
-
-	protected boolean isNextStateOnGridRunning() {
-		return isSystemOngrid() && (getGridconPcs() != null && getGridconPcs().isRunning());
-	}
-
-	protected boolean isNextStateOffGrid() {
-		if (isSystemOffgrid() && !isVoltageOnMeter()) {
-			return true;
-		}
-		return false;
-	}
-
-	protected boolean isNextStateGoingOnGrid() {
-		if (isSystemOffgrid() && isVoltageOnMeter()) {
-			return true;
-		}
-		return false;
-	}
-
-	private boolean isVoltageOnMeter() {
-		boolean ret = false;
-		try {
-			SymmetricMeter meter = manager.getComponent(meterId);
-			Channel<Integer> voltageChannel = meter.getVoltage();
-			int voltage = voltageChannel.value().orElse(0); // voltage is in mV
-			ret = voltage > BaseState.VOLTAGE_GRID;
-		} catch (OpenemsNamedException e) {
-			ret = false;
-		}
-		return ret;
-	}
+//	protected boolean isNextStateUndefined() { //TODO wozu?! eigtl müsste ich prüfen sind alle geräte da und sind die channel gesetzt...
+//		return !isDigitalInputsDefined() || !isJanitzaCommunicationWorking();
+//	}
+//
+//	private boolean isJanitzaCommunicationWorking() {
+//		String modbusId = this.meterModbusBridgeId;
+//		ComponentManager manager = this.manager;
+//		AbstractModbusBridge modbusBridge = null;
+//		try {
+//			modbusBridge = manager.getComponent(modbusId);
+//		} catch (OpenemsNamedException e) {
+//			System.out.println("Cannot get modbus component");
+//		}
+//		if (modbusBridge == null) {
+//			return false;
+//		}
+//
+//		Channel<Boolean> slaveCommunicationFailedChannel = modbusBridge.getSlaveCommunicationFailedChannel();
+//		Optional<Boolean> communicationFailedOpt = slaveCommunicationFailedChannel.value().asOptional();
+//
+//		if (!communicationFailedOpt.isPresent()) {
+//			return false;
+//		}
+//		
+//		
+//		return !communicationFailedOpt.get();
+//	}
+//	
+//	private boolean isDigitalInputsDefined() {
+//		boolean defined = true;
+//
+//		defined = defined && isDigitalInputDefined(inputNA1);
+//		defined = defined && isDigitalInputDefined(inputNA2);
+//		defined = defined && isDigitalInputDefined(inputSyncBridge);
+//
+//		return defined;
+//	}
+//
+//	private boolean isDigitalInputDefined(String inputAddress) {
+//		boolean defined = false;
+//		try {
+//			BooleanReadChannel inputChannel = getBooleanReadChannel(inputAddress);
+//			defined = isValueDefined(inputChannel.value());
+//		} catch (Exception e) {
+//			defined = false;
+//		}
+//		return defined;
+//	}
+//
+//	private boolean isValueDefined(Value<Boolean> value) {
+//		if (value != null) {
+//			return value.isDefined();
+//		}
+//		return false;
+//	}
+//
+//	private BooleanReadChannel getBooleanReadChannel(String channelAddress)
+//			throws IllegalArgumentException, OpenemsNamedException {
+//		return this.manager.getChannel(ChannelAddress.fromString(channelAddress));
+//	}
+//
+//
+//
+//	protected boolean isNextStateOffGrid() {
+//		if (isSystemOffgrid() && !isVoltageOnMeter()) {
+//			return true;
+//		}
+//		return false;
+//	}
+//
+//	protected boolean isNextStateGoingOnGrid() {
+//		if (isSystemOffgrid() && isVoltageOnMeter()) {
+//			return true;
+//		}
+//		return false;
+//	}
+//
+//	private boolean isVoltageOnMeter() {
+//		boolean ret = false;
+//		try {
+//			SymmetricMeter meter = manager.getComponent(meterId);
+//			Channel<Integer> voltageChannel = meter.getVoltage();
+//			int voltage = voltageChannel.value().orElse(0); // voltage is in mV
+//			ret = voltage > BaseState.VOLTAGE_GRID_MILLIVOLT;
+//		} catch (OpenemsNamedException e) {
+//			ret = false;
+//		}
+//		return ret;
+//	}
 
 	protected float getVoltageOnMeter() {
 		float ret = Float.MIN_VALUE;
@@ -216,175 +196,48 @@ public abstract class BaseState implements StateObject {
 		}
 	}
 
-	protected boolean isSystemOngrid() {
-		if (isDigitalInputDefined(inputNA1) && isDigitalInputDefined(inputNA2)) {
-			try {
-				boolean na1Value = getBooleanReadChannel(inputNA1).value().get();
-				boolean na2Value = getBooleanReadChannel(inputNA2).value().get();
+//	protected boolean isSystemOngrid() {
+//		if (isDigitalInputDefined(inputNA1) && isDigitalInputDefined(inputNA2)) {
+//			try {
+//				boolean na1Value = getBooleanReadChannel(inputNA1).value().get();
+//				boolean na2Value = getBooleanReadChannel(inputNA2).value().get();
+//
+//				if (na1Inverted) {
+//					na1Value = !na1Value;
+//				}
+//
+//				if (na2Inverted) {
+//					na2Value = !na2Value;
+//				}
+//
+//				return na1Value && na2Value;
+//			} catch (IllegalArgumentException | OpenemsNamedException e) {
+//				return false;
+//			}
+//		}
+//		return false;
+//	}
+//
+//	protected boolean isSystemOffgrid() {
+//		if (isDigitalInputDefined(inputNA1) && isDigitalInputDefined(inputNA2)) {
+//			try {
+//				boolean na1Value = getBooleanReadChannel(inputNA1).value().get();
+//				boolean na2Value = getBooleanReadChannel(inputNA2).value().get();
+//
+//				if (na1Inverted) {
+//					na1Value = !na1Value;
+//				}
+//
+//				if (na2Inverted) {
+//					na2Value = !na2Value;
+//				}
+//
+//				return !na1Value || !na2Value;
+//			} catch (IllegalArgumentException | OpenemsNamedException e) {
+//				return false;
+//			}
+//		}
+//		return false;
+//	}
 
-				if (na1Inverted) {
-					na1Value = !na1Value;
-				}
-
-				if (na2Inverted) {
-					na2Value = !na2Value;
-				}
-
-				return na1Value && na2Value;
-			} catch (IllegalArgumentException | OpenemsNamedException e) {
-				return false;
-			}
-		}
-		return false;
-	}
-
-	protected boolean isSystemOffgrid() {
-		if (isDigitalInputDefined(inputNA1) && isDigitalInputDefined(inputNA2)) {
-			try {
-				boolean na1Value = getBooleanReadChannel(inputNA1).value().get();
-				boolean na2Value = getBooleanReadChannel(inputNA2).value().get();
-
-				if (na1Inverted) {
-					na1Value = !na1Value;
-				}
-
-				if (na2Inverted) {
-					na2Value = !na2Value;
-				}
-
-				return !na1Value || !na2Value;
-			} catch (IllegalArgumentException | OpenemsNamedException e) {
-				return false;
-			}
-		}
-		return false;
-	}
-
-	protected void startBatteries() {
-		if (getBattery1() != null) {
-			if (!getBattery1().isRunning()) {
-				getBattery1().start();
-			}
-		}
-		if (getBattery2() != null) {
-			if (!getBattery2().isRunning()) {
-				getBattery2().start();
-			}
-		}
-		if (getBattery3() != null) {
-			if (!getBattery3().isRunning()) {
-				getBattery3().start();
-			}
-		}
-	}
-
-	protected boolean isBatteriesStarted() {
-		boolean running = true;
-		if (getBattery1() != null) {
-			running = running && getBattery1().isRunning();
-		}
-		if (getBattery2() != null) {
-			running = running && getBattery2().isRunning();
-		}
-		if (getBattery3() != null) {
-			running = running && getBattery3().isRunning();
-		}
-		return running;
-	}
-
-	protected void setStringControlMode() {
-		int weightingMode = WeightingHelper.getStringControlMode(getBattery1(), getBattery2(), getBattery3());
-		getGridconPcs().setStringControlMode(weightingMode);
-	}
-
-	protected void setStringWeighting() {
-		float activePower = getGridconPcs().getActivePower();
-
-		Float[] weightings = WeightingHelper.getWeighting(activePower, getBattery1(), getBattery2(), getBattery3());
-
-		getGridconPcs().setWeightStringA(weightings[0]);
-		getGridconPcs().setWeightStringB(weightings[1]);
-		getGridconPcs().setWeightStringC(weightings[2]);
-
-	}
-
-	protected void setDateAndTime() {
-		int date = this.convertToInteger(this.generateDate(LocalDateTime.now()));
-		getGridconPcs().setSyncDate(date);
-		int time = this.convertToInteger(this.generateTime(LocalDateTime.now()));
-		getGridconPcs().setSyncTime(time);
-	}
-
-	private BitSet generateDate(LocalDateTime time) {
-		byte dayOfWeek = (byte) time.getDayOfWeek().ordinal();
-		byte day = (byte) time.getDayOfMonth();
-		byte month = (byte) time.getMonth().getValue();
-		byte year = (byte) (time.getYear() - 2000); // 0 == year 2000 in the protocol
-
-		return BitSet.valueOf(new byte[] { day, dayOfWeek, year, month });
-	}
-
-	private BitSet generateTime(LocalDateTime time) {
-		byte seconds = (byte) time.getSecond();
-		byte minutes = (byte) time.getMinute();
-		byte hours = (byte) time.getHour();
-		// second byte is unused
-		return BitSet.valueOf(new byte[] { seconds, 0, hours, minutes });
-	}
-
-	private int convertToInteger(BitSet bitSet) {
-		long[] l = bitSet.toLongArray();
-		if (l.length == 0) {
-			return 0;
-		}
-		return (int) l[0];
-	}
-
-	GridconPcs getGridconPcs() {
-		return getComponent(gridconPcsId);
-	}
-
-	SoltaroBattery getBattery1() {
-		return getComponent(battery1Id);
-	}
-
-	SoltaroBattery getBattery2() {
-		return getComponent(battery2Id);
-	}
-
-	SoltaroBattery getBattery3() {
-		return getComponent(battery3Id);
-	}
-
-	<T> T getComponent(String id) {
-		T component = null;
-		try {
-			component = manager.getComponent(id);
-		} catch (OpenemsNamedException e) {
-			System.out.println(e);
-		}
-		return component;
-	}
-
-	@Override
-	public IState getStateBefore() {
-		return stateBefore;
-	}
-
-	@Override
-	public void setStateBefore(IState stateBefore) {
-		if (this.stateBefore == null || !this.stateBefore.equals(stateBefore)) {
-			this.stateBefore = stateBefore;
-		}
-	}
-
-	@Override
-	public void setSubStateObject(StateObject subStateObject) {
-		this.subStateObject = subStateObject;
-	}
-
-	@Override
-	public StateObject getSubStateObject() {
-		return subStateObject;
-	}
 }
