@@ -49,6 +49,10 @@ public class ControlAndLogic {
 		return singleRackVersionB.getContactorControl() == ContactorControl.CUT_OFF;
 	}
 	
+	protected static boolean isAlarm1PoleTempTooHot(SingleRackVersionB singleRackVersionB) {
+		return readValueFromBooleanChannel(singleRackVersionB, SingleRackVersionB.ChannelId.ALARM_LEVEL_1_POLE_TEMPERATURE_TOO_HIGH);
+	}
+	
 	protected static boolean hasError(SingleRackVersionB singleRackVersionB, int numberOfSlaves) {
 		return isAlarmLevel2Error(singleRackVersionB) || isSlaveCommunicationError(singleRackVersionB, numberOfSlaves);
 	}
