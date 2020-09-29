@@ -47,7 +47,6 @@ import io.openems.edge.common.startstop.StartStop;
 import io.openems.edge.common.startstop.StartStoppable;
 import io.openems.edge.common.sum.GridMode;
 import io.openems.edge.common.taskmanager.Priority;
-import io.openems.edge.ess.api.ManagedSymmetricEss;
 import io.openems.edge.ess.api.SymmetricEss;
 import io.openems.edge.ess.power.api.Phase;
 import io.openems.edge.ess.power.api.Power;
@@ -87,8 +86,8 @@ public class RefuStore88kImpl extends AbstractOpenemsModbusComponent implements 
 	public RefuStore88kImpl() {
 		super(//
 				OpenemsComponent.ChannelId.values(), //
-				SymmetricEss.ChannelId.values(), //
-				ManagedSymmetricEss.ChannelId.values(), //
+				SymmetricBatteryInverter.ChannelId.values(), //
+				ManagedSymmetricBatteryInverter.ChannelId.values(), //
 				StartStoppable.ChannelId.values(), //
 				RefuStore88kChannelId.values() //
 		);
