@@ -10,6 +10,7 @@ import org.osgi.service.event.EventHandler;
 import org.osgi.service.metatype.annotations.Designate;
 
 import io.openems.edge.battery.api.Battery;
+import io.openems.edge.battery.soltaro.SoltaroBattery;
 import io.openems.edge.common.component.AbstractOpenemsComponent;
 import io.openems.edge.common.component.OpenemsComponent;
 import io.openems.edge.common.event.EdgeEventConstants;
@@ -21,7 +22,7 @@ import io.openems.edge.common.event.EdgeEventConstants;
 		configurationPolicy = ConfigurationPolicy.REQUIRE, //
 		property = EventConstants.EVENT_TOPIC + "=" + EdgeEventConstants.TOPIC_CYCLE_BEFORE_PROCESS_IMAGE //
 )
-public class BatteryDummy extends AbstractOpenemsComponent implements Battery, OpenemsComponent, EventHandler {
+public class BatteryDummy extends AbstractOpenemsComponent implements Battery, OpenemsComponent, EventHandler, SoltaroBattery {
 
 	private int disChargeMinVoltage;
 	private int chargeMaxVoltage;
@@ -81,6 +82,42 @@ public class BatteryDummy extends AbstractOpenemsComponent implements Battery, O
 		this.getMaxCellVoltage().setNextValue(this.minCellVoltage);
 		
 		this.getReadyForWorking().setNextValue(true);
+	}
+
+	@Override
+	public void start() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void stop() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean isRunning() {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
+	@Override
+	public boolean isStopped() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isError() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isUndefined() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }
