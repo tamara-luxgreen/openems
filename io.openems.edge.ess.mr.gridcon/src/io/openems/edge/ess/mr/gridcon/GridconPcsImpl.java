@@ -1227,12 +1227,16 @@ public class GridconPcsImpl extends AbstractOpenemsModbusComponent implements Op
 
 	@Override
 	public boolean isStopped() {
-		return getCcuState() == CcuState.SYNC_TO_V || getCcuState() == CcuState.IDLE_CURRENTLY_NOT_WORKING;
+		return //
+			getCcuState() == CcuState.SYNC_TO_V || //
+			getCcuState() == CcuState.IDLE || //
+			getCcuState() == CcuState.BLACKSTARTING // in case of a blackstart "blackstarting" stands for the "not running" mode  
+			;
 	}
 
 	@Override
 	public boolean isRunning() {
-		return getCcuState() == CcuState.COMPENSATOR;
+		return getCcuState() == CcuState.COMPENSATOR || getCcuState() == CcuState.ISLANDING;
 	}
 
 	@Override
