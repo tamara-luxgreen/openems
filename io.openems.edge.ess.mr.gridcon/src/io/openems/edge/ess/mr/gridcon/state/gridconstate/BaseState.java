@@ -31,8 +31,8 @@ public abstract class BaseState implements GridconStateObject {
 	}
 
 	protected boolean isNextStateUndefined() {
-		if (!getGridconPcs().isCommunicationBroken() && !isGridconDefined()) {
-			System.out.println("Gridcon is undefined!");
+		if (getGridconPcs().isCommunicationBroken() || !isGridconDefined()) {
+			System.out.println("Gridcon has no communication or is undefined!");
 			return true;
 		}
 		if (!isAtLeastOneBatteryDefined()) {

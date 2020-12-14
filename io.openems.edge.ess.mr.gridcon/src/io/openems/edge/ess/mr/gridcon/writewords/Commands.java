@@ -17,6 +17,7 @@ public class Commands {
 	public static Commands getCommands() {
 		if (instance == null) {
 			instance = new Commands();
+			instance.setMode(Mode.CURRENT_CONTROL); // initial value
 		}
 		return instance;
 	}
