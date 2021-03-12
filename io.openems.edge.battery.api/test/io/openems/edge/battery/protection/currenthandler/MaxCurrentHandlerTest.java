@@ -67,6 +67,46 @@ public class MaxCurrentHandlerTest {
 	}
 
 	@Test
+	public void testChargeOpenUpLimit() {
+		final TimeLeapClock clock = new TimeLeapClock(Instant.parse("2020-01-01T01:00:00.00Z"), ZoneOffset.UTC);
+		final DummyComponentManager cm = new DummyComponentManager(clock);
+		ChargeMaxCurrentHandler sut = ChargeMaxCurrentHandler
+				.create(cm, BatteryProtectionTest.INITIAL_BMS_MAX_EVER_CURRENT) //
+				.setVoltageToPercent(BatteryProtectionTest.CHARGE_VOLTAGE_TO_PERCENT) //
+				.build();
+		assertEquals(80, (double) sut.getMaxCellVoltageToPercentLimit(3400), 0.1);
+		assertEquals(80, (double) sut.getMaxCellVoltageToPercentLimit(3450), 0.1);
+		assertEquals(53.9, (double) sut.getMaxCellVoltageToPercentLimit(3500), 0.1);
+		assertEquals(27.7, (double) sut.getMaxCellVoltageToPercentLimit(3550), 0.1);
+		assertEquals(1.6, (double) sut.getMaxCellVoltageToPercentLimit(3600), 0.1);
+		assertEquals(1.6, (double) sut.getMaxCellVoltageToPercentLimit(3620), 0.1);
+		// smallest ever is "0"
+		assertEquals(0, (double) sut.getMaxCellVoltageToPercentLimit(3650), 0.1);
+		assertEquals(0, (double) sut.getMaxCellVoltageToPercentLimit(3620), 0.1);
+		assertEquals(0, (double) sut.getMaxCellVoltageToPercentLimit(3600), 0.1);
+		assertEquals(0, (double) sut.getMaxCellVoltageToPercentLimit(3550), 0.1);
+		assertEquals(0, (double) sut.getMaxCellVoltageToPercentLimit(3500), 0.1);
+		assertEquals(0, (double) sut.getMaxCellVoltageToPercentLimit(3450), 0.1);
+		assertEquals(0, (double) sut.getMaxCellVoltageToPercentLimit(3400), 0.1);
+		// Open up fully only at 3350 mV
+		assertEquals(80, (double) sut.getMaxCellVoltageToPercentLimit(3350), 0.1);
+
+		assertEquals(80, (double) sut.getMaxCellVoltageToPercentLimit(3400), 0.1);
+		assertEquals(80, (double) sut.getMaxCellVoltageToPercentLimit(3450), 0.1);
+		assertEquals(53.9, (double) sut.getMaxCellVoltageToPercentLimit(3500), 0.1);
+		assertEquals(27.7, (double) sut.getMaxCellVoltageToPercentLimit(3550), 0.1);
+		assertEquals(1.6, (double) sut.getMaxCellVoltageToPercentLimit(3600), 0.1);
+		// smallest ever is "1.6"
+		assertEquals(1.6, (double) sut.getMaxCellVoltageToPercentLimit(3620), 0.1);
+		assertEquals(1.6, (double) sut.getMaxCellVoltageToPercentLimit(3550), 0.1);
+		assertEquals(1.6, (double) sut.getMaxCellVoltageToPercentLimit(3500), 0.1);
+		assertEquals(1.6, (double) sut.getMaxCellVoltageToPercentLimit(3450), 0.1);
+		assertEquals(1.6, (double) sut.getMaxCellVoltageToPercentLimit(3400), 0.1);
+		// Open up fully only at 3350 mV
+		assertEquals(80, (double) sut.getMaxCellVoltageToPercentLimit(3350), 0.1);
+	}
+
+	@Test
 	public void testForceDischarge() {
 		final TimeLeapClock clock = new TimeLeapClock(Instant.parse("2020-01-01T01:00:00.00Z"), ZoneOffset.UTC);
 		final DummyComponentManager cm = new DummyComponentManager(clock);

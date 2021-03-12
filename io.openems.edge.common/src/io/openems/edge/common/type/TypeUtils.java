@@ -375,9 +375,9 @@ public class TypeUtils {
 	 * Safely subtract Integers.
 	 * 
 	 * <ul>
-	 * <li>if minuend is null -> result is null
-	 * <li>if subtrahend is null -> result is minuend
-	 * <li>if both are null -> result is null
+	 * <li>if minuend is null -&gt; result is null
+	 * <li>if subtrahend is null -&gt; result is minuend
+	 * <li>if both are null -&gt; result is null
 	 * </ul>
 	 * 
 	 * @param minuend    the minuend of the subtraction
@@ -398,9 +398,9 @@ public class TypeUtils {
 	 * Safely subtract Longs.
 	 * 
 	 * <ul>
-	 * <li>if minuend is null -> result is null
-	 * <li>if subtrahend is null -> result is minuend
-	 * <li>if both are null -> result is null
+	 * <li>if minuend is null -&gt; result is null
+	 * <li>if subtrahend is null -&gt; result is minuend
+	 * <li>if both are null -&gt; result is null
 	 * </ul>
 	 * 
 	 * @param minuend    the minuend of the subtraction
@@ -457,11 +457,11 @@ public class TypeUtils {
 	 * Safely divides Integers.
 	 * 
 	 * <ul>
-	 * <li>if dividend is null -> result is null
+	 * <li>if dividend is null -&gt; result is null
 	 * </ul>
 	 * 
-	 * @param minuend    the dividend of the division
-	 * @param subtrahend the divisor of the division
+	 * @param dividend the dividend of the division
+	 * @param divisor  the divisor of the division
 	 * @return the result, possibly null
 	 */
 	public static Integer divide(Integer dividend, int divisor) {
@@ -475,11 +475,11 @@ public class TypeUtils {
 	 * Safely divides Longs.
 	 * 
 	 * <ul>
-	 * <li>if dividend is null -> result is null
+	 * <li>if dividend is null -&gt; result is null
 	 * </ul>
 	 * 
-	 * @param minuend    the dividend of the division
-	 * @param subtrahend the divisor of the division
+	 * @param dividend the dividend of the division
+	 * @param divisor  the divisor of the division
 	 * @return the result, possibly null
 	 */
 	public static Long divide(Long dividend, long divisor) {
@@ -548,6 +548,28 @@ public class TypeUtils {
 	}
 
 	/**
+	 * Safely finds the average value of all values.
+	 * 
+	 * @return the average value; or Double.NaN if all values are invalid.
+	 */
+	public static double average(double... values) {
+		int count = 0;
+		double sum = 0.;
+		for (double value : values) {
+			if (Double.isNaN(value)) {
+				continue;
+			} else {
+				count++;
+				sum += value;
+			}
+		}
+		if (count == 0) {
+			return Double.NaN;
+		}
+		return sum / count;
+	}
+
+	/**
 	 * Safely finds the average value of all values and rounds the result to an
 	 * Integer using {@link Math#round(float)}.
 	 * 
@@ -563,7 +585,24 @@ public class TypeUtils {
 	}
 
 	/**
-	 * Throws a descriptive exception if any of the objects is null.
+	 * Safely finds the min value of all values.
+	 * 
+	 * @return the min value; or null if all values are null
+	 */
+	public static Integer min(Integer... values) {
+		Integer result = null;
+		for (Integer value : values) {
+			if (result != null && value != null) {
+				result = Math.min(result, value);
+			} else if (value != null) {
+				result = value;
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * Throws an descriptive exception if the object is null.
 	 * 
 	 * @param description text that is added to the exception
 	 * @param objects     the objects

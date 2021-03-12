@@ -23,6 +23,16 @@ public abstract class AbstractMaxCurrentHandler {
 		protected PolyLine temperatureToPercent = PolyLine.empty();
 		protected Double maxIncreasePerSecond = null;
 
+		/**
+		 * Creates a {@link Builder} for {@link AbstractMaxCurrentHandler}.
+		 * 
+		 * @param clockProvider            a {@link ClockProvider}, mainly for JUnit
+		 *                                 tests
+		 * @param initialBmsMaxEverCurrent the (estimated) maximum allowed current. This
+		 *                                 is used as a reference for percentage values.
+		 *                                 If during runtime a higher value is provided,
+		 *                                 that one is taken from then on.
+		 */
 		protected Builder(ClockProvider clockProvider, int initialBmsMaxEverCurrent) {
 			this.clockProvider = clockProvider;
 			this.initialBmsMaxEverCurrent = initialBmsMaxEverCurrent;
@@ -280,7 +290,7 @@ public abstract class AbstractMaxCurrentHandler {
 
 		double thisCurrent = this.percentToAmpere(percentage);
 		final double result;
-		if (percentage > 0.9999) {
+		if (percentage > Math.nextDown(1)) {
 			// We are in the 'no limitation' zone of the PolyLine -> unset all limitations
 			result = thisCurrent;
 			activeLimit.set(null);
