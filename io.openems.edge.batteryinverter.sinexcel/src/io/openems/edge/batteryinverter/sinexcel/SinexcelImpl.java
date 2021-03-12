@@ -23,6 +23,7 @@ import io.openems.common.exceptions.OpenemsException;
 import io.openems.edge.battery.api.Battery;
 import io.openems.edge.batteryinverter.api.BatteryInverterConstraint;
 import io.openems.edge.batteryinverter.api.ManagedSymmetricBatteryInverter;
+import io.openems.edge.batteryinverter.api.OffGridBatteryInverter;
 import io.openems.edge.batteryinverter.api.SymmetricBatteryInverter;
 import io.openems.edge.batteryinverter.sinexcel.statemachine.Context;
 import io.openems.edge.batteryinverter.sinexcel.statemachine.StateMachine;
@@ -64,8 +65,8 @@ import io.openems.edge.ess.power.api.Relationship;
 				EventConstants.EVENT_TOPIC + "=" + EdgeEventConstants.TOPIC_CYCLE_AFTER_PROCESS_IMAGE, //
 				EventConstants.EVENT_TOPIC + "=" + EdgeEventConstants.TOPIC_CYCLE_BEFORE_PROCESS_IMAGE //
 		}) //
-public class SinexcelImpl extends AbstractOpenemsModbusComponent implements Sinexcel, ManagedSymmetricBatteryInverter,
-		SymmetricBatteryInverter, OpenemsComponent, StartStoppable {
+public class SinexcelImpl extends AbstractOpenemsModbusComponent implements Sinexcel, OffGridBatteryInverter,
+		ManagedSymmetricBatteryInverter, SymmetricBatteryInverter, OpenemsComponent, StartStoppable {
 
 	private final Logger log = LoggerFactory.getLogger(SinexcelImpl.class);
 
