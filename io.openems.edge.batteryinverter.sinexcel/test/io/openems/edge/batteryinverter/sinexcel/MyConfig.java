@@ -1,4 +1,4 @@
-package io.openems.edge.ess.sinexcel;
+package io.openems.edge.batteryinverter.sinexcel;
 
 import io.openems.common.utils.ConfigUtils;
 import io.openems.edge.batteryinverter.sinexcel.Config;

@@ -1,8 +1,7 @@
-package io.openems.edge.ess.sinexcel;
+package io.openems.edge.batteryinverter.sinexcel;
 
 import org.junit.Test;
 
-import io.openems.edge.batteryinverter.sinexcel.SinexcelImpl;
 import io.openems.edge.bridge.modbus.test.DummyModbusBridge;
 import io.openems.edge.common.startstop.StartStopConfig;
 import io.openems.edge.common.test.ComponentTest;
