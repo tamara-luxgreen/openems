@@ -1,10 +1,12 @@
 package io.openems.edge.batteryinverter.api;
 
 import io.openems.common.channel.Unit;
+import io.openems.common.exceptions.OpenemsError.OpenemsNamedException;
 import io.openems.common.types.OpenemsType;
 import io.openems.edge.common.channel.Channel;
 import io.openems.edge.common.channel.Doc;
 import io.openems.edge.common.channel.IntegerReadChannel;
+import io.openems.edge.common.channel.IntegerWriteChannel;
 import io.openems.edge.common.channel.value.Value;
 import io.openems.edge.common.offgrid.GridType;
 import io.openems.edge.common.offgrid.OperationMode;
@@ -35,6 +37,18 @@ public interface OffGridBatteryInverter
 		 * </ul>
 		 */
 		OFFGRID_FREQUENCY(Doc.of(OpenemsType.INTEGER)//
+				.unit(Unit.HERTZ)),
+
+		/**
+		 * SetOffGrid-Frequency.
+		 * 
+		 * <ul>
+		 * <li>Interface: {@link OffGridBatteryInverter}
+		 * <li>Type: Integer
+		 * <li>Range: 40-60
+		 * </ul>
+		 */
+		SET_OFFGRID_FREQUENCY(Doc.of(OpenemsType.INTEGER)//
 				.unit(Unit.HERTZ)),
 
 		/**
@@ -128,6 +142,26 @@ public interface OffGridBatteryInverter
 	 */
 	public default void _setOffGridFrequency(int value) {
 		this.getOffGridFrequencyChannel().setNextValue(value);
+	}
+
+	/**
+	 * Gets the Channel for {@link ChannelId#SET_OFFGRID_FREQUENCY}.
+	 *
+	 * @return the Channel
+	 */
+	public default IntegerWriteChannel getSetOffGridFrequencyChannel() {
+		return this.channel(ChannelId.SET_OFFGRID_FREQUENCY);
+	}
+
+	/**
+	 * Sets an Off Grid Frequency set point in [Hz]. See
+	 * {@link ChannelId#SET_ACTIVE_POWER_EQUALS}.
+	 * 
+	 * @param value the next write value
+	 * @throws OpenemsNamedException on error
+	 */
+	public default void setOffGridFrequency(Integer value) throws OpenemsNamedException {
+		this.getSetOffGridFrequencyChannel().setNextWriteValue(value);
 	}
 
 	/**
