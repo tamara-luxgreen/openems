@@ -1,16 +1,16 @@
-package io.openems.edge.common.sum;
+package io.openems.edge.common.offgrid;
 
 import io.openems.common.types.OptionsEnum;
 
-public enum GridType implements OptionsEnum {
+public enum OperationMode implements OptionsEnum {
 	UNDEFINED(-1, "Undefined"), //
-	THREE_PHASE_FOUR_WIRE(0, "3 Phase 4 Wire"),
-	THREE_PHASE_THREE_WIRE(1, "3 Phase 3 Wire"); //
-	
+	ONLY_ON_GRID(0, "Operate only in On Grid"), //
+	ON_AND_OFF_GRID(1, "Operate as off-gridable");
+
 	private int value;
 	private String name;
 
-	private GridType(int value, String name) {
+	private OperationMode(int value, String name) {
 		this.value = value;
 		this.name = name;
 	}
