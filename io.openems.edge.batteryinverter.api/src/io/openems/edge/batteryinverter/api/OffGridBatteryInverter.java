@@ -6,9 +6,9 @@ import io.openems.edge.common.channel.Channel;
 import io.openems.edge.common.channel.Doc;
 import io.openems.edge.common.channel.IntegerReadChannel;
 import io.openems.edge.common.channel.value.Value;
+import io.openems.edge.common.offgrid.GridType;
+import io.openems.edge.common.offgrid.OperationMode;
 import io.openems.edge.common.startstop.StartStoppable;
-import io.openems.edge.common.sum.GridType;
-import io.openems.edge.common.sum.OperationMode;
 
 public interface OffGridBatteryInverter
 		extends ManagedSymmetricBatteryInverter, SymmetricBatteryInverter, StartStoppable {
