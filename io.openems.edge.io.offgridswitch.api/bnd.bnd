@@ -1,5 +1,5 @@
-Bundle-Name: OpenEMS Edge IO Grid Off Switch Api
-Bundle-Vendor: FENECON GmbH
+Bundle-Name: OpenEMS Edge IO Grid Off Grid Switch Api
+Bundle-Vendor: OpenEMS Association e.V.
 Bundle-License: https://opensource.org/licenses/EPL-2.0
 Bundle-Version: 1.0.0.${tstamp}
 
