@@ -16,32 +16,34 @@ import org.osgi.service.event.EventHandler;
 import org.osgi.service.metatype.annotations.Designate;
 
 import io.openems.edge.battery.api.Battery;
-import io.openems.edge.batteryinverter.api.ManagedSymmetricBatteryInverter;
+import io.openems.edge.batteryinverter.api.OffGridBatteryInverter;
 import io.openems.edge.common.component.ComponentManager;
 import io.openems.edge.common.component.OpenemsComponent;
 import io.openems.edge.common.event.EdgeEventConstants;
 import io.openems.edge.common.modbusslave.ModbusSlave;
 import io.openems.edge.common.startstop.StartStoppable;
 import io.openems.edge.ess.api.ManagedSymmetricEss;
+import io.openems.edge.ess.api.OffGridEss;
 import io.openems.edge.ess.api.SymmetricEss;
 import io.openems.edge.ess.generic.common.AbstractGenericEssChannelManager;
 import io.openems.edge.ess.generic.common.AbstractGenericManagedEss;
 import io.openems.edge.ess.generic.common.GenericManagedEss;
+import io.openems.edge.ess.generic.symmetric.ChannelManager;
 import io.openems.edge.ess.power.api.Power;
 import io.openems.edge.io.offgridswitch.api.OffGridSwitch;
 
 @Designate(ocd = Config.class, factory = true)
 @Component(//
-		name = "Ess.Generic.Managed ", //
+		name = "Ess.Generic.OffGrid.Ess", //
 		immediate = true, //
 		configurationPolicy = ConfigurationPolicy.REQUIRE, //
 		property = { //
 				EventConstants.EVENT_TOPIC + "=" + EdgeEventConstants.TOPIC_CYCLE_AFTER_PROCESS_IMAGE //
 		} //
 )
-public class GenericOffGridEssImpl extends AbstractGenericManagedEss<Battery, ManagedSymmetricBatteryInverter>
+public class GenericOffGridEssImpl extends AbstractGenericManagedEss<Battery, OffGridBatteryInverter>
 		implements GenericManagedEss, ManagedSymmetricEss, SymmetricEss, OpenemsComponent, EventHandler, StartStoppable,
-		ModbusSlave {
+		ModbusSlave, OffGridEss {
 
 	@Reference
 	private Power power;
@@ -53,15 +55,15 @@ public class GenericOffGridEssImpl extends AbstractGenericManagedEss<Battery, Ma
 	private ComponentManager componentManager;
 
 	@Reference(policy = ReferencePolicy.STATIC, policyOption = ReferencePolicyOption.GREEDY, cardinality = ReferenceCardinality.MANDATORY)
-	private ManagedSymmetricBatteryInverter batteryInverter;
+	private OffGridBatteryInverter batteryInverter;
 
 	@Reference(policy = ReferencePolicy.STATIC, policyOption = ReferencePolicyOption.GREEDY, cardinality = ReferenceCardinality.MANDATORY)
 	private Battery battery;
-	
+
 	@Reference(policy = ReferencePolicy.STATIC, policyOption = ReferencePolicyOption.GREEDY, cardinality = ReferenceCardinality.MANDATORY)
 	private OffGridSwitch offGridSwitch;
 
-	private final ChannelManager channelManager = new ChannelManager(this);
+	private final AbstractGenericEssChannelManager channelManager = new ChannelManager(this);
 
 	public GenericOffGridEssImpl() {
 		super(//
@@ -69,7 +71,8 @@ public class GenericOffGridEssImpl extends AbstractGenericManagedEss<Battery, Ma
 				StartStoppable.ChannelId.values(), //
 				SymmetricEss.ChannelId.values(), //
 				ManagedSymmetricEss.ChannelId.values(), //
-				GenericManagedEss.ChannelId.values() //
+				GenericManagedEss.ChannelId.values(), //
+				OffGridBatteryInverter.ChannelId.values()//
 		);
 	}
 
@@ -95,7 +98,7 @@ public class GenericOffGridEssImpl extends AbstractGenericManagedEss<Battery, Ma
 	}
 
 	@Override
-	protected AbstractGenericEssChannelManager<Battery, ManagedSymmetricBatteryInverter> getChannelManager() {
+	protected AbstractGenericEssChannelManager<Battery, OffGridBatteryInverter> getChannelManager() {
 		return this.channelManager;
 	}
 
@@ -105,7 +108,7 @@ public class GenericOffGridEssImpl extends AbstractGenericManagedEss<Battery, Ma
 	}
 
 	@Override
-	protected ManagedSymmetricBatteryInverter getBatteryInverter() {
+	protected OffGridBatteryInverter getBatteryInverter() {
 		return this.batteryInverter;
 	}
 

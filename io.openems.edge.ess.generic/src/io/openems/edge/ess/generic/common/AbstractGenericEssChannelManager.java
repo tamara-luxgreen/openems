@@ -92,5 +92,4 @@ public class AbstractGenericEssChannelManager<BATTERY extends Battery, BATTERY_I
 			targetChannel.setNextValue(value);
 		});
 	}
-
 }
