@@ -23,18 +23,16 @@ import io.openems.edge.common.event.EdgeEventConstants;
 import io.openems.edge.common.modbusslave.ModbusSlave;
 import io.openems.edge.common.startstop.StartStoppable;
 import io.openems.edge.ess.api.ManagedSymmetricEss;
-import io.openems.edge.ess.api.OffGridEss;
 import io.openems.edge.ess.api.SymmetricEss;
 import io.openems.edge.ess.generic.common.AbstractGenericEssChannelManager;
 import io.openems.edge.ess.generic.common.AbstractGenericManagedEss;
 import io.openems.edge.ess.generic.common.GenericManagedEss;
-import io.openems.edge.ess.generic.symmetric.ChannelManager;
 import io.openems.edge.ess.power.api.Power;
 import io.openems.edge.io.offgridswitch.api.OffGridSwitch;
 
 @Designate(ocd = Config.class, factory = true)
 @Component(//
-		name = "Ess.Generic.OffGrid.Ess", //
+		name = "Ess.Generic.OffGridEss", //
 		immediate = true, //
 		configurationPolicy = ConfigurationPolicy.REQUIRE, //
 		property = { //
@@ -43,7 +41,7 @@ import io.openems.edge.io.offgridswitch.api.OffGridSwitch;
 )
 public class GenericOffGridEssImpl extends AbstractGenericManagedEss<Battery, OffGridBatteryInverter>
 		implements GenericManagedEss, ManagedSymmetricEss, SymmetricEss, OpenemsComponent, EventHandler, StartStoppable,
-		ModbusSlave, OffGridEss {
+		ModbusSlave {
 
 	@Reference
 	private Power power;
@@ -63,7 +61,7 @@ public class GenericOffGridEssImpl extends AbstractGenericManagedEss<Battery, Of
 	@Reference(policy = ReferencePolicy.STATIC, policyOption = ReferencePolicyOption.GREEDY, cardinality = ReferenceCardinality.MANDATORY)
 	private OffGridSwitch offGridSwitch;
 
-	private final AbstractGenericEssChannelManager channelManager = new ChannelManager(this);
+	private final ChannelManager channelManager = new ChannelManager(this);
 
 	public GenericOffGridEssImpl() {
 		super(//
@@ -71,8 +69,7 @@ public class GenericOffGridEssImpl extends AbstractGenericManagedEss<Battery, Of
 				StartStoppable.ChannelId.values(), //
 				SymmetricEss.ChannelId.values(), //
 				ManagedSymmetricEss.ChannelId.values(), //
-				GenericManagedEss.ChannelId.values(), //
-				OffGridBatteryInverter.ChannelId.values()//
+				GenericManagedEss.ChannelId.values() //
 		);
 	}
 
