@@ -1,0 +1,3 @@
+= io.openems.edge.io.offgridswitch
+
+https://github.com/OpenEMS/openems/tree/develop/io.openems.edge.io.offgridswitch[Source Code icon:github[]]

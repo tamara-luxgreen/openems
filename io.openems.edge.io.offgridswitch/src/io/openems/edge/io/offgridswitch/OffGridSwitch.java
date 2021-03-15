@@ -1,4 +1,4 @@
-package io.openems.edge.io.api;
+package io.openems.edge.io.offgridswitch;
 
 import io.openems.common.channel.AccessMode;
 import io.openems.common.exceptions.OpenemsError.OpenemsNamedException;
