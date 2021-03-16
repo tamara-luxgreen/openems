@@ -3,6 +3,7 @@ package io.openems.edge.ess.generic.offgridswitch;
 import org.osgi.service.metatype.annotations.AttributeDefinition;
 import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 
+import io.openems.edge.common.offgrid.OperationMode;
 import io.openems.edge.common.startstop.StartStopConfig;
 
 @ObjectClassDefinition(//
@@ -21,6 +22,9 @@ import io.openems.edge.common.startstop.StartStopConfig;
 
 	@AttributeDefinition(name = "Start/stop behaviour?", description = "Should this Component be forced to start or stop?")
 	StartStopConfig startStop() default StartStopConfig.START;
+	
+	@AttributeDefinition(name = "only ongrid or ON/ off grid ??", description = "What type of operation nedded , only on grid or on / off grid ??")
+	OperationMode operation_mode() default OperationMode.ONLY_ON_GRID;
 
 	@AttributeDefinition(name = "Battery-Inverter-ID", description = "ID of Battery-Inverter.")
 	String batteryInverter_id() default "batteryInverter0";

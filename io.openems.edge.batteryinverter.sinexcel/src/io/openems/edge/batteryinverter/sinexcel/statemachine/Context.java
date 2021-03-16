@@ -1,6 +1,7 @@
 package io.openems.edge.batteryinverter.sinexcel.statemachine;
 
 import io.openems.common.exceptions.OpenemsError.OpenemsNamedException;
+import io.openems.edge.batteryinverter.api.OffGridBatteryInverter;
 import io.openems.edge.batteryinverter.sinexcel.Config;
 import io.openems.edge.batteryinverter.sinexcel.Sinexcel;
 import io.openems.edge.batteryinverter.sinexcel.enums.FalseTrue;
@@ -52,7 +53,7 @@ public class Context extends AbstractContext<Sinexcel> {
 	 * @throws OpenemsNamedException on error
 	 */
 	protected void softStart(boolean switchOn) throws OpenemsNamedException {
-		IntegerWriteChannel setDcRelay = this.getParent().channel(Sinexcel.ChannelId.SET_INTERN_DC_RELAY);
+		IntegerWriteChannel setDcRelay = this.getParent().channel(OffGridBatteryInverter.ChannelId.SET_INTERN_DC_RELAY);
 		setDcRelay.setNextWriteValue(switchOn ? 1 : 0);
 	}
 
@@ -65,7 +66,7 @@ public class Context extends AbstractContext<Sinexcel> {
 	public void islandOn() throws OpenemsNamedException {
 		IntegerWriteChannel setAntiIslanding = this.getParent().channel(Sinexcel.ChannelId.SET_ANTI_ISLANDING);
 		setAntiIslanding.setNextWriteValue(0); // Disabled
-		IntegerWriteChannel setDataGridOffCmd = this.getParent().channel(Sinexcel.ChannelId.OFF_GRID_CMD);
+		IntegerWriteChannel setDataGridOffCmd = this.getParent().channel(OffGridBatteryInverter.ChannelId.OFF_GRID_CMD);
 		setDataGridOffCmd.setNextWriteValue(1); // Stop
 	}
 

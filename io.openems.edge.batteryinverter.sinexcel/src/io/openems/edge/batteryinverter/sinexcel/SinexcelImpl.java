@@ -97,6 +97,7 @@ public class SinexcelImpl extends AbstractOpenemsModbusComponent implements Sine
 	public SinexcelImpl() throws OpenemsNamedException {
 		super(//
 				OpenemsComponent.ChannelId.values(), //
+				OffGridBatteryInverter.ChannelId.values(),//
 				SymmetricBatteryInverter.ChannelId.values(), //
 				ManagedSymmetricBatteryInverter.ChannelId.values(), //
 				StartStoppable.ChannelId.values(), //
@@ -192,14 +193,14 @@ public class SinexcelImpl extends AbstractOpenemsModbusComponent implements Sine
 				new FC6WriteRegisterTask(0x028B, //
 						m(Sinexcel.ChannelId.MOD_OFF_CMD, new UnsignedWordElement(0x028B))),
 				new FC6WriteRegisterTask(0x028C, //
-						m(Sinexcel.ChannelId.CLEAR_FAILURE_CMD, new UnsignedWordElement(0x028C))),
+						m(OffGridBatteryInverter.ChannelId.CLEAR_FAILURE_CMD, new UnsignedWordElement(0x028C))),
 				new FC6WriteRegisterTask(0x028D, //
-						m(Sinexcel.ChannelId.ON_GRID_CMD, new UnsignedWordElement(0x028D))),
+						m(OffGridBatteryInverter.ChannelId.ON_GRID_CMD, new UnsignedWordElement(0x028D))),
 				new FC6WriteRegisterTask(0x028E, //
-						m(Sinexcel.ChannelId.OFF_GRID_CMD, new UnsignedWordElement(0x028E))),
+						m(OffGridBatteryInverter.ChannelId.OFF_GRID_CMD, new UnsignedWordElement(0x028E))),
 
 				new FC6WriteRegisterTask(0x0290, // FIXME: not documented!
-						m(Sinexcel.ChannelId.SET_INTERN_DC_RELAY, new UnsignedWordElement(0x0290))),
+						m(OffGridBatteryInverter.ChannelId.SET_INTERN_DC_RELAY, new UnsignedWordElement(0x0290))),
 
 				new FC6WriteRegisterTask(0x0087, //
 						m(Sinexcel.ChannelId.SET_ACTIVE_POWER, new SignedWordElement(0x0087),
@@ -288,6 +289,14 @@ public class SinexcelImpl extends AbstractOpenemsModbusComponent implements Sine
 						m(Sinexcel.ChannelId.LOWER_VOLTAGE_LIMIT, new UnsignedWordElement(0x032D), //
 								ElementToChannelConverter.SCALE_FACTOR_MINUS_1),
 						m(Sinexcel.ChannelId.UPPER_VOLTAGE_LIMIT, new UnsignedWordElement(0x032E), //
+								ElementToChannelConverter.SCALE_FACTOR_MINUS_1)),
+
+				new FC3ReadRegistersTask(0x008A, Priority.LOW,
+						m(OffGridBatteryInverter.ChannelId.OFF_GRID_FREQUENCY, new SignedWordElement(0x008A), //
+								ElementToChannelConverter.SCALE_FACTOR_MINUS_1)),
+
+				new FC16WriteRegistersTask(0x008A,
+						m(OffGridBatteryInverter.ChannelId.OFF_GRID_FREQUENCY, new SignedWordElement(0x008A), //
 								ElementToChannelConverter.SCALE_FACTOR_MINUS_1)),
 
 				new FC3ReadRegistersTask(0x0262, Priority.LOW, //

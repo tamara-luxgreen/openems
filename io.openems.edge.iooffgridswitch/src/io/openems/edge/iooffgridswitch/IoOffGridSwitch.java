@@ -26,7 +26,7 @@ import io.openems.edge.io.offgridswitch.api.OffGridSwitch;
 )
 public class IoOffGridSwitch extends AbstractOpenemsComponent implements OffGridSwitch, OpenemsComponent, EventHandler {
 
-	private Config config = null;
+//	private Config config = null;
 
 	public IoOffGridSwitch() {
 		super(//
@@ -38,7 +38,7 @@ public class IoOffGridSwitch extends AbstractOpenemsComponent implements OffGrid
 	@Activate
 	void activate(ComponentContext context, Config config) {
 		super.activate(context, config.id(), config.alias(), config.enabled());
-		this.config = config;
+//		this.config = config;
 	}
 
 	@Deactivate

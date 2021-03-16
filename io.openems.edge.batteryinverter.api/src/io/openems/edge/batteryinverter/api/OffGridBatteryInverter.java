@@ -1,5 +1,8 @@
 package io.openems.edge.batteryinverter.api;
 
+import org.osgi.annotation.versioning.ProviderType;
+
+import io.openems.common.channel.AccessMode;
 import io.openems.common.channel.Unit;
 import io.openems.common.exceptions.OpenemsError.OpenemsNamedException;
 import io.openems.common.types.OpenemsType;
@@ -9,9 +12,9 @@ import io.openems.edge.common.channel.IntegerReadChannel;
 import io.openems.edge.common.channel.IntegerWriteChannel;
 import io.openems.edge.common.channel.value.Value;
 import io.openems.edge.common.offgrid.GridType;
-import io.openems.edge.common.offgrid.OperationMode;
 import io.openems.edge.common.startstop.StartStoppable;
 
+@ProviderType
 public interface OffGridBatteryInverter
 		extends ManagedSymmetricBatteryInverter, SymmetricBatteryInverter, StartStoppable {
 
@@ -28,7 +31,7 @@ public interface OffGridBatteryInverter
 		GRID_TYPE(Doc.of(GridType.values())),
 
 		/**
-		 * OffGrid-Frequency.
+		 * Off-Grid-Frequency.
 		 * 
 		 * <ul>
 		 * <li>Interface: {@link OffGridBatteryInverter}
@@ -36,32 +39,21 @@ public interface OffGridBatteryInverter
 		 * <li>Range: 40-60
 		 * </ul>
 		 */
-		OFFGRID_FREQUENCY(Doc.of(OpenemsType.INTEGER)//
+		OFF_GRID_FREQUENCY(Doc.of(OpenemsType.INTEGER) //
+				.accessMode(AccessMode.READ_WRITE) //
 				.unit(Unit.HERTZ)),
 
-		/**
-		 * SetOffGrid-Frequency.
-		 * 
-		 * <ul>
-		 * <li>Interface: {@link OffGridBatteryInverter}
-		 * <li>Type: Integer
-		 * <li>Range: 40-60
-		 * </ul>
-		 */
-		SET_OFFGRID_FREQUENCY(Doc.of(OpenemsType.INTEGER)//
-				.unit(Unit.HERTZ)),
+		ON_GRID_CMD(Doc.of(OpenemsType.BOOLEAN) //
+				.accessMode(AccessMode.READ_WRITE)), //
 
-		/**
-		 * OffGrid-Frequency.
-		 * 
-		 * <ul>
-		 * <li>Interface: {@link OffGridBatteryInverter}
-		 * <li>Type: Integer
-		 * <li>Range: 45-55
-		 * </ul>
-		 */
-		OPERATION_MODE(Doc.of(OperationMode.values()))
+		OFF_GRID_CMD(Doc.of(OpenemsType.BOOLEAN) //
+				.accessMode(AccessMode.READ_WRITE)), //
 
+		SET_INTERN_DC_RELAY(Doc.of(OpenemsType.INTEGER) //
+				.accessMode(AccessMode.READ_WRITE) //
+				.unit(Unit.NONE)),
+		CLEAR_FAILURE_CMD(Doc.of(OpenemsType.BOOLEAN) //
+				.accessMode(AccessMode.READ_WRITE)),
 		;
 
 		private final Doc doc;
@@ -112,11 +104,11 @@ public interface OffGridBatteryInverter
 	 * @return the Channel
 	 */
 	public default IntegerReadChannel getOffGridFrequencyChannel() {
-		return this.channel(ChannelId.OFFGRID_FREQUENCY);
+		return this.channel(ChannelId.OFF_GRID_FREQUENCY);
 	}
 
 	/**
-	 * Gets the * {@link ChannelId#OFFGRID_FREQUENCY}.
+	 * Gets the * {@link ChannelId#OFF_GRID_FREQUENCY}.
 	 *
 	 * @return the Channel {@link Value}
 	 */
@@ -125,8 +117,8 @@ public interface OffGridBatteryInverter
 	}
 
 	/**
-	 * Internal method to set the 'nextValue' on {@link ChannelId#OFFGRID_FREQUENCY}
-	 * Channel.
+	 * Internal method to set the 'nextValue' on
+	 * {@link ChannelId#OFF_GRID_FREQUENCY} Channel.
 	 *
 	 * @param value the next value
 	 */
@@ -135,8 +127,8 @@ public interface OffGridBatteryInverter
 	}
 
 	/**
-	 * Internal method to set the 'nextValue' on {@link ChannelId#OFFGRID_FREQUENCY}
-	 * Channel.
+	 * Internal method to set the 'nextValue' on
+	 * {@link ChannelId#OFF_GRID_FREQUENCY} Channel.
 	 *
 	 * @param value the next value
 	 */
@@ -145,12 +137,12 @@ public interface OffGridBatteryInverter
 	}
 
 	/**
-	 * Gets the Channel for {@link ChannelId#SET_OFFGRID_FREQUENCY}.
+	 * Gets the Channel for {@link ChannelId#OFF_GRID_FREQUENCY}.
 	 *
 	 * @return the Channel
 	 */
 	public default IntegerWriteChannel getSetOffGridFrequencyChannel() {
-		return this.channel(ChannelId.SET_OFFGRID_FREQUENCY);
+		return this.channel(ChannelId.OFF_GRID_FREQUENCY);
 	}
 
 	/**
@@ -163,34 +155,4 @@ public interface OffGridBatteryInverter
 	public default void setOffGridFrequency(Integer value) throws OpenemsNamedException {
 		this.getSetOffGridFrequencyChannel().setNextWriteValue(value);
 	}
-
-	/**
-	 * Gets the Channel for {@link ChannelId#OPERATION_MODE}.
-	 * 
-	 * @return the Channel
-	 */
-	public default Channel<OperationMode> getOperationModeChannel() {
-		return this.channel(ChannelId.OPERATION_MODE);
-	}
-
-	/**
-	 * Will inverter operate only in On grid or On/Off grid mode.
-	 * {@link ChannelId#OPERATION_MODE}.
-	 * 
-	 * @return the Channel {@link Value}
-	 */
-	public default OperationMode getOperationMode() {
-		return this.getOperationModeChannel().value().asEnum();
-	}
-
-	/**
-	 * Internal method to set the 'nextValue' on {@link ChannelId#OPERATION_MODE}
-	 * Channel.
-	 * 
-	 * @param value the next value
-	 */
-	public default void _setOperaitonMode(OperationMode value) {
-		this.getOperationModeChannel().setNextValue(value);
-	}
-
 }
