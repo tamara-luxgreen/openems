@@ -8,6 +8,8 @@ import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.openems.common.channel.AccessMode;
 import io.openems.common.exceptions.OpenemsError.OpenemsNamedException;
@@ -27,6 +29,7 @@ import io.openems.edge.common.startstop.StartStoppable;
 import io.openems.edge.ess.api.ManagedSymmetricEss;
 import io.openems.edge.ess.api.OffGridEss;
 import io.openems.edge.ess.api.SymmetricEss;
+import io.openems.edge.ess.generic.common.statemachine.OffGridContext;
 import io.openems.edge.ess.generic.common.statemachine.StateMachine;
 import io.openems.edge.ess.generic.common.statemachine.StateMachine.State;
 import io.openems.edge.ess.power.api.Constraint;
@@ -44,7 +47,7 @@ public abstract class AbstractGenericOffGridEss<BATTERY extends Battery, BATTERY
 		extends AbstractOpenemsComponent implements GenericManagedEss, OffGridEss, ManagedSymmetricEss, SymmetricEss,
 		OpenemsComponent, EventHandler, StartStoppable, ModbusSlave {
 
-//	private final Logger log = LoggerFactory.getLogger(AbstractGenericOffGridEss.class);
+	private final Logger log = LoggerFactory.getLogger(AbstractGenericOffGridEss.class);
 
 	/**
 	 * Manages the {@link State}s of the StateMachine.
@@ -130,44 +133,19 @@ public abstract class AbstractGenericOffGridEss<BATTERY extends Battery, BATTERY
 		this._setStartStop(StartStop.UNDEFINED);
 
 		// Prepare Context
-//		OffGridContext context = new OffGridContext(this, this.getBattery(), this.getBatteryInverter(),
-//				this.getOffGridSwitch());
+		OffGridContext context = new OffGridContext(this, this.getBattery(), this.getBatteryInverter(),
+				this.getOffGridSwitch());
 
 		// Call the StateMachine
-//		try {
-		// getStateFromInputs
-		// decisionVariable
+		try {
+			this.stateMachine.run(context);
 
-//		switch (state) {
-//
-//		case TOTAL_ONGRID:
-//			return new TotalOnGridHandler();
-//			
-//		case TOTAL_OFFGRID:
-//			return new TotalOffGridHandler();
-//			
-//		case UNDEFINED:
-//			return new UndefinedHandler();
-//		case ERROR:
-//			return new ErrorHandler();
-//		case GROUNDSET:
-//			return new GroundSetHandler();
-//		case START:
-//			return new StartInverterHandler();
-//		case STOP:
-//			return new StopInverterHandler();
-//		}
+			this.channel(GenericManagedEss.ChannelId.RUN_FAILED).setNextValue(false);
 
-//		throw new IllegalArgumentException("Unknown State [" + state + "]");
-
-//			this.stateMachine.run(context);
-//
-//			this.channel(GenericManagedEss.ChannelId.RUN_FAILED).setNextValue(false);
-//
-//		} catch (OpenemsNamedException e) {
-//			this.channel(GenericManagedEss.ChannelId.RUN_FAILED).setNextValue(true);
-//			this.logError(this.log, "StateMachine failed: " + e.getMessage());
-//		}
+		} catch (OpenemsNamedException e) {
+			this.channel(GenericManagedEss.ChannelId.RUN_FAILED).setNextValue(true);
+			this.logError(this.log, "StateMachine failed: " + e.getMessage());
+		}
 	}
 
 	@Override
