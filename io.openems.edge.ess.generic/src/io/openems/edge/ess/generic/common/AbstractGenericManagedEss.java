@@ -94,30 +94,6 @@ public abstract class AbstractGenericManagedEss<BATTERY extends Battery, BATTERY
 		this.getChannelManager().activate(this.getComponentManager(), this.getBattery(), this.getBatteryInverter());
 	}
 
-	protected void activate(ComponentContext context, String id, String alias, boolean enabled,
-			StartStopConfig startStopConfig, ConfigurationAdmin cm, String batteryInverterId, String batteryId,
-			String ioOffGridSwitchId) {
-		super.activate(context, id, alias, enabled);
-		this.startStopConfig = startStopConfig;
-
-		// update filter for 'BatteryInverter'
-		if (OpenemsComponent.updateReferenceFilter(cm, this.servicePid(), "batteryInverter", batteryInverterId)) {
-			return;
-		}
-
-		// update filter for 'Battery'
-		if (OpenemsComponent.updateReferenceFilter(cm, this.servicePid(), "battery", batteryId)) {
-			return;
-		}
-
-		// update filter for 'Off Grid Switch'
-		if (OpenemsComponent.updateReferenceFilter(cm, this.servicePid(), "offGridSwitch", ioOffGridSwitchId)) {
-			return;
-		}
-
-		this.getChannelManager().activate(this.getComponentManager(), this.getBattery(), this.getBatteryInverter());
-	}
-
 	protected void deactivate() {
 		this.getChannelManager().deactivate();
 		super.deactivate();

@@ -2,7 +2,6 @@ package io.openems.edge.ess.generic.common;
 
 import io.openems.edge.battery.api.Battery;
 import io.openems.edge.batteryinverter.api.ManagedSymmetricBatteryInverter;
-import io.openems.edge.batteryinverter.api.OffGridBatteryInverter;
 import io.openems.edge.batteryinverter.api.SymmetricBatteryInverter;
 import io.openems.edge.common.channel.AbstractChannelListenerManager;
 import io.openems.edge.common.channel.Channel;
@@ -10,7 +9,6 @@ import io.openems.edge.common.channel.ChannelId;
 import io.openems.edge.common.component.ClockProvider;
 import io.openems.edge.common.component.OpenemsComponent;
 import io.openems.edge.ess.api.SymmetricEss;
-import io.openems.edge.io.offgridswitch.api.OffGridSwitch;
 
 /**
  * Helper wrapping class to handle everything related to Channels; in particular
@@ -37,24 +35,11 @@ public class AbstractGenericEssChannelManager<BATTERY extends Battery, BATTERY_I
 	 */
 	public void activate(ClockProvider clockProvider, Battery battery,
 			ManagedSymmetricBatteryInverter batteryInverter) {
-		/*
-		 * Battery
-		 */
-		this.addOnSetNextValueListener(battery, Battery.ChannelId.DISCHARGE_MIN_VOLTAGE,
-				(ignored) -> this.allowedChargeDischargeHandler.accept(clockProvider, battery));
-		this.addOnSetNextValueListener(battery, Battery.ChannelId.DISCHARGE_MAX_CURRENT,
-				(ignored) -> this.allowedChargeDischargeHandler.accept(clockProvider, battery));
-		this.addOnSetNextValueListener(battery, Battery.ChannelId.CHARGE_MAX_VOLTAGE,
-				(ignored) -> this.allowedChargeDischargeHandler.accept(clockProvider, battery));
-		this.addOnSetNextValueListener(battery, Battery.ChannelId.CHARGE_MAX_CURRENT,
-				(ignored) -> this.allowedChargeDischargeHandler.accept(clockProvider, battery));
-		this.addCopyListener(battery, //
-				Battery.ChannelId.CAPACITY, //
-				SymmetricEss.ChannelId.CAPACITY);
-		this.addCopyListener(battery, //
-				Battery.ChannelId.SOC, //
-				SymmetricEss.ChannelId.SOC);
+		addBatteryListener(clockProvider, battery);
+		addBatteryInverterListener(batteryInverter);
+	}
 
+	private void addBatteryInverterListener(ManagedSymmetricBatteryInverter batteryInverter) {
 		/*
 		 * Battery-Inverter
 		 */
@@ -78,8 +63,7 @@ public class AbstractGenericEssChannelManager<BATTERY extends Battery, BATTERY_I
 				SymmetricEss.ChannelId.REACTIVE_POWER);
 	}
 
-	public void activate(ClockProvider clockProvider, Battery battery, OffGridBatteryInverter batteryInverter,
-			OffGridSwitch offGridSwitch) {
+	private void addBatteryListener(ClockProvider clockProvider, Battery battery) {
 		/*
 		 * Battery
 		 */
@@ -97,31 +81,6 @@ public class AbstractGenericEssChannelManager<BATTERY extends Battery, BATTERY_I
 		this.addCopyListener(battery, //
 				Battery.ChannelId.SOC, //
 				SymmetricEss.ChannelId.SOC);
-
-		/*
-		 * Battery-Inverter
-		 */
-		this.<Long>addCopyListener(batteryInverter, //
-				SymmetricBatteryInverter.ChannelId.ACTIVE_CHARGE_ENERGY, //
-				SymmetricEss.ChannelId.ACTIVE_CHARGE_ENERGY);
-		this.<Long>addCopyListener(batteryInverter, //
-				SymmetricBatteryInverter.ChannelId.ACTIVE_DISCHARGE_ENERGY, //
-				SymmetricEss.ChannelId.ACTIVE_DISCHARGE_ENERGY);
-		this.<Long>addCopyListener(batteryInverter, //
-				SymmetricBatteryInverter.ChannelId.ACTIVE_POWER, //
-				SymmetricEss.ChannelId.ACTIVE_POWER);
-		this.<Long>addCopyListener(batteryInverter, //
-				SymmetricBatteryInverter.ChannelId.GRID_MODE, //
-				SymmetricEss.ChannelId.GRID_MODE);
-		this.<Long>addCopyListener(batteryInverter, //
-				SymmetricBatteryInverter.ChannelId.MAX_APPARENT_POWER, //
-				SymmetricEss.ChannelId.MAX_APPARENT_POWER);
-		this.<Long>addCopyListener(batteryInverter, //
-				SymmetricBatteryInverter.ChannelId.REACTIVE_POWER, //
-				SymmetricEss.ChannelId.REACTIVE_POWER);
-
-		this.addOnSetNextValueListener(battery, Battery.ChannelId.DISCHARGE_MIN_VOLTAGE,
-				(ignored) -> this.allowedChargeDischargeHandler.accept(clockProvider, battery));
 	}
 
 	/**

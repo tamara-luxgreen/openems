@@ -25,7 +25,7 @@ import io.openems.edge.common.startstop.StartStoppable;
 import io.openems.edge.ess.api.ManagedSymmetricEss;
 import io.openems.edge.ess.api.SymmetricEss;
 import io.openems.edge.ess.generic.common.AbstractGenericEssChannelManager;
-import io.openems.edge.ess.generic.common.AbstractGenericManagedEss;
+import io.openems.edge.ess.generic.common.AbstractGenericOffGridEss;
 import io.openems.edge.ess.generic.common.GenericManagedEss;
 import io.openems.edge.ess.power.api.Power;
 import io.openems.edge.io.offgridswitch.api.OffGridSwitch;
@@ -39,7 +39,7 @@ import io.openems.edge.io.offgridswitch.api.OffGridSwitch;
 				EventConstants.EVENT_TOPIC + "=" + EdgeEventConstants.TOPIC_CYCLE_AFTER_PROCESS_IMAGE //
 		} //
 )
-public class GenericOffGridEssImpl extends AbstractGenericManagedEss<Battery, OffGridBatteryInverter>
+public class GenericOffGridEssImpl extends AbstractGenericOffGridEss<Battery, OffGridBatteryInverter, OffGridSwitch>
 		implements GenericManagedEss, ManagedSymmetricEss, SymmetricEss, OpenemsComponent, EventHandler, StartStoppable,
 		ModbusSlave {
 
@@ -114,4 +114,8 @@ public class GenericOffGridEssImpl extends AbstractGenericManagedEss<Battery, Of
 		return this.componentManager;
 	}
 
+	@Override
+	protected OffGridSwitch getOffGridSwitch() {
+		return this.offGridSwitch;
+	}
 }

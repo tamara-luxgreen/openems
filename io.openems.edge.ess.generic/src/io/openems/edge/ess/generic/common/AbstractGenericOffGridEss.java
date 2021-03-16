@@ -101,8 +101,7 @@ public abstract class AbstractGenericOffGridEss<BATTERY extends Battery, BATTERY
 		if (OpenemsComponent.updateReferenceFilter(cm, this.servicePid(), "offGridSwitch", ioOffGridSwitchId)) {
 			return;
 		}
-		this.getChannelManager().activate(this.getComponentManager(), this.getBattery(), this.getBatteryInverter(),
-				this.getOffGridSwitch());
+		this.getChannelManager().activate(this.getComponentManager(), this.getBattery(), this.getBatteryInverter());
 	}
 
 	protected void deactivate() {
