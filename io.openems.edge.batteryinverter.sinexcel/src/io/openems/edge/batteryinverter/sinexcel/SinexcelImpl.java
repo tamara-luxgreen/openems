@@ -334,7 +334,7 @@ public class SinexcelImpl extends AbstractOpenemsModbusComponent implements Sine
 						m(new BitsWordElement(0x0020, this) //
 								.bit(0, Sinexcel.ChannelId.STATE_16) //
 								.bit(1, Sinexcel.ChannelId.STATE_17) //
-								.bit(2, Sinexcel.ChannelId.STATE_ON) //
+								.bit(2, OffGridBatteryInverter.ChannelId.INVERTER_STATE) //
 								.bit(3, Sinexcel.ChannelId.STATE_19) //
 								.bit(4, Sinexcel.ChannelId.STATE_20))),
 
