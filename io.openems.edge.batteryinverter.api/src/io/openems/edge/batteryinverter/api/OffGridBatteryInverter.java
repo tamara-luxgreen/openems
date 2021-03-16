@@ -48,6 +48,12 @@ public interface OffGridBatteryInverter
 
 		OFF_GRID_CMD(Doc.of(OpenemsType.BOOLEAN) //
 				.accessMode(AccessMode.READ_WRITE)), //
+		
+		MOD_ON_CMD(Doc.of(OpenemsType.BOOLEAN) //
+				.accessMode(AccessMode.READ_WRITE)), //
+
+		MOD_OFF_CMD(Doc.of(OpenemsType.BOOLEAN) //
+				.accessMode(AccessMode.READ_WRITE)), //
 
 		SET_INTERN_DC_RELAY(Doc.of(OpenemsType.INTEGER) //
 				.accessMode(AccessMode.READ_WRITE) //

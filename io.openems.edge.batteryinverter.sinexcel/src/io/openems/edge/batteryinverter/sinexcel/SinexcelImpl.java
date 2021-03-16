@@ -97,7 +97,7 @@ public class SinexcelImpl extends AbstractOpenemsModbusComponent implements Sine
 	public SinexcelImpl() throws OpenemsNamedException {
 		super(//
 				OpenemsComponent.ChannelId.values(), //
-				OffGridBatteryInverter.ChannelId.values(),//
+				OffGridBatteryInverter.ChannelId.values(), //
 				SymmetricBatteryInverter.ChannelId.values(), //
 				ManagedSymmetricBatteryInverter.ChannelId.values(), //
 				StartStoppable.ChannelId.values(), //
