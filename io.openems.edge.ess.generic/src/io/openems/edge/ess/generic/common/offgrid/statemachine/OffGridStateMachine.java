@@ -6,9 +6,9 @@ import io.openems.common.types.OptionsEnum;
 import io.openems.edge.common.statemachine.AbstractStateMachine;
 import io.openems.edge.common.statemachine.StateHandler;
 
-public class OffGridStateMachine extends AbstractStateMachine<OffGridStateMachine.State, OffGridContext> {
+public class OffGridStateMachine extends AbstractStateMachine<OffGridStateMachine.OffGridState, OffGridContext> {
 
-	public enum State implements io.openems.edge.common.statemachine.State<State>, OptionsEnum {
+	public enum OffGridState implements io.openems.edge.common.statemachine.State<OffGridState>, OptionsEnum {
 
 		UNDEFINED(-1), //
 
@@ -24,7 +24,7 @@ public class OffGridStateMachine extends AbstractStateMachine<OffGridStateMachin
 
 		private final int value;
 
-		private State(int value) {
+		private OffGridState(int value) {
 			this.value = value;
 		}
 
@@ -44,17 +44,17 @@ public class OffGridStateMachine extends AbstractStateMachine<OffGridStateMachin
 		}
 
 		@Override
-		public State[] getStates() {
-			return State.values();
+		public OffGridState[] getStates() {
+			return OffGridState.values();
 		}
 	}
 
-	public OffGridStateMachine(State initialState) {
+	public OffGridStateMachine(OffGridState initialState) {
 		super(initialState);
 	}
 
 	@Override
-	public StateHandler<State, OffGridContext> getStateHandler(State state) {
+	public StateHandler<OffGridState, OffGridContext> getStateHandler(OffGridState state) {
 		switch (state) {
 
 		case TOTAL_ONGRID:

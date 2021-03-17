@@ -28,7 +28,7 @@ public class Context extends AbstractContext<Sinexcel> {
 	 * @throws OpenemsNamedException on error
 	 */
 	protected void setInverterOn() throws OpenemsNamedException {
-		EnumWriteChannel setdataModOnCmd = this.getParent().channel(Sinexcel.ChannelId.MOD_ON_CMD);
+		EnumWriteChannel setdataModOnCmd = this.getParent().channel(OffGridBatteryInverter.ChannelId.MOD_ON_CMD);
 		setdataModOnCmd.setNextWriteValue(FalseTrue.TRUE); // true = START
 	}
 
@@ -38,7 +38,7 @@ public class Context extends AbstractContext<Sinexcel> {
 	 * @throws OpenemsNamedException on error
 	 */
 	protected void setInverterOff() throws OpenemsNamedException {
-		EnumWriteChannel setdataModOffCmd = this.getParent().channel(Sinexcel.ChannelId.MOD_OFF_CMD);
+		EnumWriteChannel setdataModOffCmd = this.getParent().channel(OffGridBatteryInverter.ChannelId.MOD_OFF_CMD);
 		setdataModOffCmd.setNextWriteValue(FalseTrue.TRUE); // true = STOP
 	}
 

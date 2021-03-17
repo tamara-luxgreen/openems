@@ -9,7 +9,6 @@ import io.openems.common.types.OpenemsType;
 import io.openems.edge.batteryinverter.api.ManagedSymmetricBatteryInverter;
 import io.openems.edge.batteryinverter.api.OffGridBatteryInverter;
 import io.openems.edge.batteryinverter.api.SymmetricBatteryInverter;
-import io.openems.edge.batteryinverter.sinexcel.enums.FalseTrue;
 import io.openems.edge.batteryinverter.sinexcel.enums.SinexcelState;
 import io.openems.edge.batteryinverter.sinexcel.statemachine.StateMachine.State;
 import io.openems.edge.common.channel.BooleanReadChannel;
@@ -24,8 +23,8 @@ import io.openems.edge.common.startstop.StartStop;
 import io.openems.edge.common.startstop.StartStoppable;
 import io.openems.edge.common.sum.GridMode;
 
-public interface Sinexcel extends OffGridBatteryInverter, ManagedSymmetricBatteryInverter, SymmetricBatteryInverter, OpenemsComponent,
-		StartStoppable, ModbusSlave {
+public interface Sinexcel extends OffGridBatteryInverter, ManagedSymmetricBatteryInverter, SymmetricBatteryInverter,
+		OpenemsComponent, StartStoppable, ModbusSlave {
 
 	public enum ChannelId implements io.openems.edge.common.channel.ChannelId {
 		STATE_MACHINE(Doc.of(State.values()) //
@@ -33,10 +32,10 @@ public interface Sinexcel extends OffGridBatteryInverter, ManagedSymmetricBatter
 		RUN_FAILED(Doc.of(Level.FAULT) //
 				.text("Running the Logic failed")), //
 
-		MOD_ON_CMD(Doc.of(FalseTrue.values()) //
-				.accessMode(AccessMode.READ_WRITE)), //
-		MOD_OFF_CMD(Doc.of(FalseTrue.values()) //
-				.accessMode(AccessMode.READ_WRITE)), //
+//		MOD_ON_CMD(Doc.of(FalseTrue.values()) //
+//				.accessMode(AccessMode.READ_WRITE)), //
+//		MOD_OFF_CMD(Doc.of(FalseTrue.values()) //
+//				.accessMode(AccessMode.READ_WRITE)), //
 //		CLEAR_FAILURE_CMD(Doc.of(FalseTrue.values()) //
 //				.accessMode(AccessMode.READ_WRITE)), //
 //		ON_GRID_CMD(Doc.of(FalseTrue.values()) //

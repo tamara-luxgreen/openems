@@ -29,6 +29,9 @@ import io.openems.edge.common.startstop.StartStoppable;
 import io.openems.edge.ess.api.ManagedSymmetricEss;
 import io.openems.edge.ess.api.OffGridEss;
 import io.openems.edge.ess.api.SymmetricEss;
+import io.openems.edge.ess.generic.common.offgrid.statemachine.OffGridContext;
+import io.openems.edge.ess.generic.common.offgrid.statemachine.OffGridStateMachine;
+import io.openems.edge.ess.generic.common.offgrid.statemachine.OffGridStateMachine.OffGridState;
 import io.openems.edge.ess.generic.common.statemachine.StateMachine;
 import io.openems.edge.ess.generic.common.statemachine.StateMachine.State;
 import io.openems.edge.ess.power.api.Constraint;
@@ -47,6 +50,11 @@ public abstract class AbstractGenericOffGridEss<BATTERY extends Battery, BATTERY
 		OpenemsComponent, EventHandler, StartStoppable, ModbusSlave {
 
 	private final Logger log = LoggerFactory.getLogger(AbstractGenericOffGridEss.class);
+
+	/**
+	 * Manages the {@link OffGridState}s of the StateMachine.
+	 */
+	private final OffGridStateMachine offGridStateMachine = new OffGridStateMachine(OffGridState.UNDEFINED);
 
 	/**
 	 * Manages the {@link State}s of the StateMachine.
@@ -131,23 +139,26 @@ public abstract class AbstractGenericOffGridEss<BATTERY extends Battery, BATTERY
 		// Initialize 'Start-Stop' Channel
 		this._setStartStop(StartStop.UNDEFINED);
 
-//		// Prepare Context
-//		OffGridContext context = new OffGridContext(this, this.getBattery(), this.getBatteryInverter(),
-//				this.getOffGridSwitch());
+		// Prepare Context
+		OffGridContext context = new OffGridContext(this, this.getBattery(), this.getBatteryInverter(),
+				this.getOffGridSwitch());
 
 		// Call the StateMachine
-//		try {
+		try {
+
+			//this.offGridStateMachine.run(context);
 			
-			
+			if (this.stateMachine.getCurrentState() == State.START_BATTERY) {
+				this.offGridStateMachine.run(context);
+			}
 			
 //			this.stateMachine.run(context);
 
 			this.channel(GenericManagedEss.ChannelId.RUN_FAILED).setNextValue(false);
-//
-//		} catch (OpenemsNamedException e) {
-//			this.channel(GenericManagedEss.ChannelId.RUN_FAILED).setNextValue(true);
-//			this.logError(this.log, "StateMachine failed: " + e.getMessage());
-//		}
+		} catch (OpenemsNamedException e) {
+			this.channel(GenericManagedEss.ChannelId.RUN_FAILED).setNextValue(true);
+			this.logError(this.log, "StateMachine failed: " + e.getMessage());
+		}
 	}
 
 	@Override

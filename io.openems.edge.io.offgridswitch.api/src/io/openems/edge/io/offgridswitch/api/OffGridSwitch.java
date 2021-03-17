@@ -123,7 +123,7 @@ public interface OffGridSwitch extends OpenemsComponent {
 	/**
 	 * See {@link ChannelId#SET_MAIN_CONTACTOR}.
 	 * 
-	 * @param value the next write value
+	 * @param optional the next write value
 	 * @throws OpenemsNamedException on error
 	 */
 	public default void setMainContactor(Boolean value) throws OpenemsNamedException {

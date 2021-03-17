@@ -189,9 +189,9 @@ public class SinexcelImpl extends AbstractOpenemsModbusComponent implements Sine
 		return new ModbusProtocol(this, //
 
 				new FC6WriteRegisterTask(0x028A, //
-						m(Sinexcel.ChannelId.MOD_ON_CMD, new UnsignedWordElement(0x028A))),
+						m(OffGridBatteryInverter.ChannelId.MOD_ON_CMD, new UnsignedWordElement(0x028A))),
 				new FC6WriteRegisterTask(0x028B, //
-						m(Sinexcel.ChannelId.MOD_OFF_CMD, new UnsignedWordElement(0x028B))),
+						m(OffGridBatteryInverter.ChannelId.MOD_OFF_CMD, new UnsignedWordElement(0x028B))),
 				new FC6WriteRegisterTask(0x028C, //
 						m(OffGridBatteryInverter.ChannelId.CLEAR_FAILURE_CMD, new UnsignedWordElement(0x028C))),
 				new FC6WriteRegisterTask(0x028D, //

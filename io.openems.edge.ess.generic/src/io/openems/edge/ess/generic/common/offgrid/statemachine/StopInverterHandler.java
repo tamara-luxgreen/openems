@@ -1,16 +1,16 @@
 package io.openems.edge.ess.generic.common.offgrid.statemachine;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.time.Duration;
 import java.time.Instant;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.openems.common.exceptions.OpenemsError.OpenemsNamedException;
 import io.openems.edge.common.statemachine.StateHandler;
-import io.openems.edge.ess.generic.common.offgrid.statemachine.OffGridStateMachine.State;
+import io.openems.edge.ess.generic.common.offgrid.statemachine.OffGridStateMachine.OffGridState;
 
-public class StopInverterHandler extends StateHandler<State, OffGridContext> {
+public class StopInverterHandler extends StateHandler<OffGridState, OffGridContext> {
 
 	private Instant lastAttempt = Instant.MIN;
 
@@ -24,7 +24,7 @@ public class StopInverterHandler extends StateHandler<State, OffGridContext> {
 	}
 
 	@Override
-	protected State runAndGetNextState(OffGridContext context) throws OpenemsNamedException {
+	protected OffGridState runAndGetNextState(OffGridContext context) throws OpenemsNamedException {
 
 		Instant now = Instant.now();
 
@@ -32,13 +32,13 @@ public class StopInverterHandler extends StateHandler<State, OffGridContext> {
 		long waitingSeconds = 0;
 
 		// isOngrid ?
-		if (!context.getGridDetector()) {
+		if (!context.gridDetector) {
 			log.info("Going from off-grid to on-grid");
 			waitingSeconds = 65;
 		}
 
 		// isOffgrid ?
-		if (context.getGridDetector()) {
+		if (context.gridDetector) {
 
 			log.info("Going from on-grid to off-grid");
 			waitingSeconds = 3;
@@ -49,16 +49,16 @@ public class StopInverterHandler extends StateHandler<State, OffGridContext> {
 		if (isWaitingTimePassed) {
 			log.info("Inside  StopInverter handler");
 			// Stop the inverter no matter what
-			context.setInverterOff();
-			context.setInverterOff();
-			
-			log.info("Is inverter on ? :" + context.stateOnOff());
+			context.batteryInverter.setInverterOff();
+			context.batteryInverter.setInverterOff();
+
+			log.info("Is inverter on ? :" + context.batteryInverter.stateOnOff());
 
 			// go to grounding set step after stopping
-			return State.GROUNDSET;
+			return OffGridState.GROUNDSET;
 		} else {
 			log.info("Waiting seconds " + Duration.between(this.lastAttempt, now).getSeconds() + " seconds");
-			return State.STOP;
+			return OffGridState.STOP;
 		}
 
 	}

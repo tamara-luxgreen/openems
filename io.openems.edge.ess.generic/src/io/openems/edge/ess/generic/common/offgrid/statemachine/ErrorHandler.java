@@ -2,9 +2,9 @@ package io.openems.edge.ess.generic.common.offgrid.statemachine;
 
 import io.openems.common.exceptions.OpenemsError.OpenemsNamedException;
 import io.openems.edge.common.statemachine.StateHandler;
-import io.openems.edge.ess.generic.common.offgrid.statemachine.OffGridStateMachine.State;
+import io.openems.edge.ess.generic.common.offgrid.statemachine.OffGridStateMachine.OffGridState;
 
-public class ErrorHandler extends StateHandler<State, OffGridContext> {
+public class ErrorHandler extends StateHandler<OffGridState, OffGridContext> {
 
 	private int attemptCounter = 0;
 
@@ -14,38 +14,38 @@ public class ErrorHandler extends StateHandler<State, OffGridContext> {
 	}
 
 	@Override
-	protected State runAndGetNextState(OffGridContext context) throws OpenemsNamedException {
+	protected OffGridState runAndGetNextState(OffGridContext context) throws OpenemsNamedException {
 		context.getParent();
 		if (this.attemptCounter > 5) {
 			// switch off
-			context.setInverterOff();
-			return State.ERROR;
+			context.batteryInverter.setInverterOff();
+			return OffGridState.ERROR;
 		} else {
 
-			State decisionVariable = context.stateTransitionHelper();
+			OffGridState decisionVariable = context.stateTransitionHelper();
 			switch (decisionVariable) {
 
 			case GROUNDSET:
-				return State.GROUNDSET;
+				return OffGridState.GROUNDSET;
 
 			case TOTAL_OFFGRID:
-				return State.TOTAL_OFFGRID;
+				return OffGridState.TOTAL_OFFGRID;
 
 			case TOTAL_ONGRID:
-				return State.TOTAL_ONGRID;
+				return OffGridState.TOTAL_ONGRID;
 
 			case UNDEFINED:
-				return State.UNDEFINED;
+				return OffGridState.UNDEFINED;
 
 			case ERROR:
 			case START:
 			case STOP:
-				return State.ERROR;
+				return OffGridState.ERROR;
 
 			}
 			// This should never happen too
 			this.attemptCounter++;
-			return State.UNDEFINED;
+			return OffGridState.UNDEFINED;
 		}
 	}
 }

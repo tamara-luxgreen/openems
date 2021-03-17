@@ -6,57 +6,52 @@ import org.slf4j.LoggerFactory;
 import io.openems.common.exceptions.OpenemsError.OpenemsNamedException;
 import io.openems.edge.common.statemachine.StateHandler;
 import io.openems.edge.common.sum.GridMode;
-import io.openems.edge.ess.generic.common.offgrid.statemachine.OffGridStateMachine.State;
+import io.openems.edge.ess.generic.common.offgrid.statemachine.OffGridStateMachine.OffGridState;
 
-public class TotalOnGridHandler extends StateHandler<State, OffGridContext> {
+public class TotalOnGridHandler extends StateHandler<OffGridState, OffGridContext> {
 
 	private final Logger log = LoggerFactory.getLogger(TotalOnGridHandler.class);
 
 	protected boolean StartOnce = false;
 
 	@Override
-	protected State runAndGetNextState(OffGridContext context) throws OpenemsNamedException {
+	protected OffGridState runAndGetNextState(OffGridContext context) throws OpenemsNamedException {
 		log.info("inside total ongrid state");
-		if (context.getGridDetector()) {
-			return State.STOP;
+		if (context.gridDetector) {
+			return OffGridState.STOP;
 		}
 
-		context.setInverterOn();
-		//context.softStart(true);
-		boolean isInvOn = context.stateOnOff();
+		context.batteryInverter.setInverterOn();
+		// context.softStart(true);
+		boolean isInvOn = context.batteryInverter.stateOnOff();
 		log.info("Is inverter on ? :" + isInvOn);
-		
-	
-		
+
 		if (isInvOn) {
 			// Inverter is on
 
-
 			// 1. Give command to make it on-grid
-			context.setOngridCommand();
+			context.batteryInverter.setOngridCommand();
 
-		    // do this before , make it undefined
-				
+			// do this before , make it undefined
+
 			// 2. Set the grid mode to Ongrid
 			context.getParent()._setGridMode(GridMode.ON_GRID);
 
 		} else {
 			log.info("Inverter is not on , going back to swithc on inverter");
-			return State.TOTAL_ONGRID;
-		}	
-		
+			return OffGridState.TOTAL_ONGRID;
+		}
 
 		// Run in the ongrid state
 
 		// 1. Give command to make it on-grid
-		context.setOngridCommand();
+		context.batteryInverter.setOngridCommand();
 
 		// 2. Set the grid mode to Ongrid
 		context.getParent()._setGridMode(GridMode.ON_GRID);
 
-		
-		//TYPO we need this later 
-		
+		// TYPO we need this later
+
 //		// 3. Do the softstart of the sinexcel
 //		CurrentState currentState = context.component.getSinexcelState();
 //
@@ -75,6 +70,6 @@ public class TotalOnGridHandler extends StateHandler<State, OffGridContext> {
 //		default:
 //			context.component.softStart(false);
 //		}
-		return State.TOTAL_ONGRID;
+		return OffGridState.TOTAL_ONGRID;
 	}
 }
