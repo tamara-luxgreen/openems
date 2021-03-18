@@ -55,15 +55,15 @@ public class GroundSetHandler extends StateHandler<OffGridState, OffGridContext>
 			// isOngrid ?
 			if (!context.offGridSwitch.getGridStatus()) {
 				// grounding set to goto ongrid
-				context.offGridSwitch.setGroundingContactor(false);
-				context.offGridSwitch.setMainContactor(false);
+				//context.offGridSwitch.handleWritingDigitalOutput(context.offGridSwitch.ou,false);
+				//context.offGridSwitch.setMainContactor(false);
 				return OffGridState.TOTAL_ONGRID;
 			}
 
 			// isOffgrid ?
 			if (context.offGridSwitch.getGridStatus()) {
 				// grounding set to goto ongrid
-				context.offGridSwitch.setGroundingContactor(true);
+				//context.offGridSwitch.setGroundingContactor(true);
 				return OffGridState.TOTAL_OFFGRID;
 			}
 		}

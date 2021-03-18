@@ -1,5 +1,7 @@
 package io.openems.edge.iooffgridswitch;
 
+import java.util.Optional;
+
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -10,10 +12,13 @@ import org.osgi.service.event.Event;
 import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 import org.osgi.service.metatype.annotations.Designate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.openems.common.exceptions.OpenemsError.OpenemsNamedException;
 import io.openems.common.types.ChannelAddress;
 import io.openems.edge.common.channel.BooleanReadChannel;
+import io.openems.edge.common.channel.BooleanWriteChannel;
 import io.openems.edge.common.component.AbstractOpenemsComponent;
 import io.openems.edge.common.component.ComponentManager;
 import io.openems.edge.common.component.OpenemsComponent;
@@ -30,13 +35,16 @@ import io.openems.edge.io.offgridswitch.api.OffGridSwitch;
 		} //
 )
 public class IoOffGridSwitch extends AbstractOpenemsComponent implements OffGridSwitch, OpenemsComponent, EventHandler {
-	private ChannelAddress mainContactorChannelAddr;
-	private ChannelAddress groundingContactorChannelAddr;
-	private ChannelAddress gridStatusChannelAddr;
 
-//	protected Optional<Boolean> mainContactor;
-//	protected Optional<Boolean> gridDetector;
-//	protected Optional<Boolean> grounding;
+	private final Logger log = LoggerFactory.getLogger(IoOffGridSwitch.class);
+
+	private ChannelAddress inputMainContactorChannelAddr;
+	private ChannelAddress inputGridStatusChannelAddr;
+	private ChannelAddress inputGroundingContactorChannelAddr;
+
+	public ChannelAddress outputMainContactorChannelAddr;
+	private ChannelAddress outputGroundingContactorChannelAddr;
+	private ChannelAddress outputGridStatusChannelAddr;
 
 	@Reference
 	protected ComponentManager componentManager;
@@ -54,9 +62,13 @@ public class IoOffGridSwitch extends AbstractOpenemsComponent implements OffGrid
 	void activate(ComponentContext context, Config config) throws OpenemsNamedException {
 		super.activate(context, config.id(), config.alias(), config.enabled());
 		this.config = config;
-		this.mainContactorChannelAddr = ChannelAddress.fromString(this.config.digitalInput1());
-		this.groundingContactorChannelAddr = ChannelAddress.fromString(this.config.digitalInput2());
-		this.gridStatusChannelAddr = ChannelAddress.fromString(this.config.digitalInput3());
+		this.inputMainContactorChannelAddr = ChannelAddress.fromString(this.config.digitalInput1());
+		this.inputGridStatusChannelAddr = ChannelAddress.fromString(this.config.digitalInput2());
+		this.inputGroundingContactorChannelAddr = ChannelAddress.fromString(this.config.digitalInput3());
+
+		this.outputMainContactorChannelAddr = ChannelAddress.fromString(this.config.digitalInput1());
+		this.outputGridStatusChannelAddr = ChannelAddress.fromString(this.config.digitalInput2());
+		this.outputGroundingContactorChannelAddr = ChannelAddress.fromString(this.config.digitalInput3());
 	}
 
 	@Deactivate
@@ -79,14 +91,30 @@ public class IoOffGridSwitch extends AbstractOpenemsComponent implements OffGrid
 	public void handleInputOutput() {
 		BooleanReadChannel inChannel1, inChannel2, inChannel3;
 		try {
-			inChannel1 = this.componentManager.getChannel(mainContactorChannelAddr);
+			inChannel1 = this.componentManager.getChannel(inputMainContactorChannelAddr);
 			this._setMainContactor(inChannel1.value().getOrError());
-			inChannel2 = this.componentManager.getChannel(gridStatusChannelAddr);
+			inChannel2 = this.componentManager.getChannel(inputGridStatusChannelAddr);
 			this._setGridStatus(inChannel2.value().getOrError());
-			inChannel3 = this.componentManager.getChannel(groundingContactorChannelAddr);
+			inChannel3 = this.componentManager.getChannel(inputGroundingContactorChannelAddr);
 			this._setGroundingContactor(inChannel3.value().getOrError());
 		} catch (IllegalArgumentException | OpenemsNamedException e) {
 			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void handleWritingDigitalOutput(BooleanWriteChannel channel, boolean value) {
+		{
+			try {
+				Optional<Boolean> currentValueOpt = channel.value().asOptional();
+				if (!currentValueOpt.isPresent() || currentValueOpt.get() != value) {
+					this.log.info("Set output [" + channel.address() + "] " + (value) + ".");
+					channel.setNextWriteValue(value);
+				}
+			} catch (OpenemsNamedException e) {
+				this.log.error("Unable to set output: [" + channel.address() + "] " + e.getMessage());
+
+			}
 		}
 	}
 }
