@@ -16,60 +16,15 @@ public class TotalOnGridHandler extends StateHandler<OffGridState, OffGridContex
 
 	@Override
 	protected OffGridState runAndGetNextState(OffGridContext context) throws OpenemsNamedException {
-		log.info("inside total ongrid state");
+
+		this.log.info("We are in total ongrid state");
+		
 		if (context.gridDetector) {
-			return OffGridState.STOP;
+			return OffGridState.GROUNDSET;
 		}
-
-		context.batteryInverter.setInverterOn();
-		// context.softStart(true);
-		boolean isInvOn = context.batteryInverter.stateOnOff();
-		log.info("Is inverter on ? :" + isInvOn);
-
-		if (isInvOn) {
-			// Inverter is on
-
-			// 1. Give command to make it on-grid
-			context.batteryInverter.setOngridCommand();
-
-			// do this before , make it undefined
-
-			// 2. Set the grid mode to Ongrid
-			context.getParent()._setGridMode(GridMode.ON_GRID);
-
-		} else {
-			log.info("Inverter is not on , going back to swithc on inverter");
-			return OffGridState.TOTAL_ONGRID;
-		}
-
-		// Run in the ongrid state
-
-		// 1. Give command to make it on-grid
+		
 		context.batteryInverter.setOngridCommand();
-
-		// 2. Set the grid mode to Ongrid
 		context.getParent()._setGridMode(GridMode.ON_GRID);
-
-		// TYPO we need this later
-
-//		// 3. Do the softstart of the sinexcel
-//		CurrentState currentState = context.component.getSinexcelState();
-//
-//		switch (currentState) {
-//		case UNDEFINED:
-//		case SLEEPING:
-//		case MPPT:
-//		case THROTTLED:
-//		case STARTED:
-//		case STANDBY:
-//			context.component.softStart(true);
-//			break;
-//		case SHUTTINGDOWN:
-//		case FAULT:
-//		case OFF:
-//		default:
-//			context.component.softStart(false);
-//		}
 		return OffGridState.TOTAL_ONGRID;
 	}
 }

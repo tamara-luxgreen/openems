@@ -138,7 +138,7 @@ public abstract class AbstractGenericOffGridEss<BATTERY extends Battery, BATTERY
 
 		// Initialize 'Start-Stop' Channel
 		this._setStartStop(StartStop.UNDEFINED);
-
+		
 		// Prepare Context
 		OffGridContext context = new OffGridContext(this, this.getBattery(), this.getBatteryInverter(),
 				this.getOffGridSwitch());
@@ -146,13 +146,9 @@ public abstract class AbstractGenericOffGridEss<BATTERY extends Battery, BATTERY
 		// Call the StateMachine
 		try {
 
-			//this.offGridStateMachine.run(context);
-			
-			if (this.stateMachine.getCurrentState() == State.START_BATTERY) {
-				this.offGridStateMachine.run(context);
-			}
-			
-//			this.stateMachine.run(context);
+			this.offGridStateMachine.run(context);
+
+			this.stateMachine.run(context);
 
 			this.channel(GenericManagedEss.ChannelId.RUN_FAILED).setNextValue(false);
 		} catch (OpenemsNamedException e) {

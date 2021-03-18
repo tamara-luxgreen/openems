@@ -78,7 +78,7 @@ public interface OffGridBatteryInverter
 		 * <li>Type: FalseTrue
 		 * </ul>
 		 */
-		MOD_ON_CMD(Doc.of(FalseTrue.values()) //
+		MOD_ON_CMD(Doc.of(OpenemsType.BOOLEAN) //
 				.accessMode(AccessMode.READ_WRITE)), //
 
 		/**

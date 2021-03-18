@@ -26,11 +26,6 @@ public class UndefinedHandler extends StateHandler<OffGridState, OffGridContext>
 		case UNDEFINED:
 			return OffGridState.UNDEFINED;
 
-		// This should never happen
-		case START:
-		case STOP:
-			break;
-
 		}
 		// This should never happen too
 		return OffGridState.UNDEFINED;

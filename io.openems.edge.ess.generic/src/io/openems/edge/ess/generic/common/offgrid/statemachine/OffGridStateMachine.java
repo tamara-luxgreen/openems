@@ -12,14 +12,12 @@ public class OffGridStateMachine extends AbstractStateMachine<OffGridStateMachin
 
 		UNDEFINED(-1), //
 
-		TOTAL_ONGRID(1), //
+		TOTAL_ONGRID(0), //
 		
-		ERROR(2), //
-		START(3), //
-		STOP(4), //
-		GROUNDSET(5), //		
+		ERROR(1), //
+		GROUNDSET(2), //		
 
-		TOTAL_OFFGRID(6) //
+		TOTAL_OFFGRID(3) //
 		; //
 
 		private final int value;
@@ -69,85 +67,9 @@ public class OffGridStateMachine extends AbstractStateMachine<OffGridStateMachin
 			return new ErrorHandler();
 		case GROUNDSET:
 			return new GroundSetHandler();
-		case START:
-			return new StartInverterHandler();
-		case STOP:
-			return new StopInverterHandler();
 		}
 
 		throw new IllegalArgumentException("Unknown State [" + state + "]");
 	}
 
-	
-
-	/**
-	 * The states which is used in the sinexcel switch from On-grid mode to off-grid
-	 * mode and vice-versa. This switching needs total to 8 states, because state
-	 * transition is decided with 3 digital inputs
-	 * 
-	 * <table border="1">
-	 * 
-	 * <tr>
-	 * <td>DI1</td>
-	 * <td>DI2</td>
-	 * <td>DI3</td>
-	 * <td>State</td>
-	 * </tr>
-	 * <tr>
-	 * <td>0</td>
-	 * <td>0</td>
-	 * <td>0</td>
-	 * <td>State</td>
-	 * </tr>
-	 * 
-	 * <tr>
-	 * <td>0</td>
-	 * <td>0</td>
-	 * <td>1</td>
-	 * <td>State</td>
-	 * </tr>
-	 * 
-	 * <tr>
-	 * <td>0</td>
-	 * <td>1</td>
-	 * <td>0</td>
-	 * <td>State</td>
-	 * </tr>
-	 * 
-	 * <tr>
-	 * <td>0</td>
-	 * <td>1</td>
-	 * <td>1</td>
-	 * <td>State</td>
-	 * </tr>
-	 * 
-	 * <tr>
-	 * <td>1</td>
-	 * <td>0</td>
-	 * <td>0</td>
-	 * <td>State</td>
-	 * </tr>
-	 * 
-	 * <tr>
-	 * <td>1</td>
-	 * <td>0</td>
-	 * <td>1</td>
-	 * <td>State</td>
-	 * </tr>
-	 * 
-	 * <tr>
-	 * <td>1</td>
-	 * <td>1</td>
-	 * <td>0</td>
-	 * <td>State</td>
-	 * </tr>
-	 * 
-	 * <tr>
-	 * <td>1</td>
-	 * <td>1</td>
-	 * <td>1</td>
-	 * <td>State</td>
-	 * </tr>
-	 * </table>
-	 */
 }

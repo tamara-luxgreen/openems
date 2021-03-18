@@ -38,8 +38,6 @@ public class ErrorHandler extends StateHandler<OffGridState, OffGridContext> {
 				return OffGridState.UNDEFINED;
 
 			case ERROR:
-			case START:
-			case STOP:
 				return OffGridState.ERROR;
 
 			}

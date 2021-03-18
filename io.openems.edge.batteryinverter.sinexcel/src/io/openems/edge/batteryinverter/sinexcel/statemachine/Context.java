@@ -5,6 +5,7 @@ import io.openems.edge.batteryinverter.api.OffGridBatteryInverter;
 import io.openems.edge.batteryinverter.sinexcel.Config;
 import io.openems.edge.batteryinverter.sinexcel.Sinexcel;
 import io.openems.edge.batteryinverter.sinexcel.enums.FalseTrue;
+import io.openems.edge.common.channel.BooleanWriteChannel;
 import io.openems.edge.common.channel.EnumWriteChannel;
 import io.openems.edge.common.channel.IntegerWriteChannel;
 import io.openems.edge.common.statemachine.AbstractContext;
@@ -28,8 +29,8 @@ public class Context extends AbstractContext<Sinexcel> {
 	 * @throws OpenemsNamedException on error
 	 */
 	protected void setInverterOn() throws OpenemsNamedException {
-		EnumWriteChannel setdataModOnCmd = this.getParent().channel(OffGridBatteryInverter.ChannelId.MOD_ON_CMD);
-		setdataModOnCmd.setNextWriteValue(FalseTrue.TRUE); // true = START
+		BooleanWriteChannel setdataModOnCmd = this.getParent().channel(OffGridBatteryInverter.ChannelId.MOD_ON_CMD);
+		setdataModOnCmd.setNextWriteValue(true); // true = START
 	}
 
 	/**
