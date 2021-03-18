@@ -9,7 +9,7 @@ public class UndefinedHandler extends StateHandler<OffGridState, OffGridContext>
 	@Override
 	protected OffGridState runAndGetNextState(OffGridContext context) throws OpenemsNamedException {
 
-		OffGridState decisionVariable = context.stateTransitionHelper();
+		OffGridState decisionVariable = context.getStateFromInputs();
 		switch (decisionVariable) {
 		case ERROR:
 			return OffGridState.ERROR;
@@ -29,7 +29,5 @@ public class UndefinedHandler extends StateHandler<OffGridState, OffGridContext>
 		}
 		// This should never happen too
 		return OffGridState.UNDEFINED;
-
 	}
-
 }

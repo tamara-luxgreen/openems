@@ -17,7 +17,7 @@ public class TotalOffGridHandler extends StateHandler<OffGridState, OffGridConte
 	protected OffGridState runAndGetNextState(OffGridContext context) throws OpenemsNamedException {
 
 		log.info("Inside total offgrid handler");
-		if (!context.gridDetector) {
+		if (!context.offGridSwitch.getGridStatus()) {
 			return OffGridState.GROUNDSET;
 		}
 

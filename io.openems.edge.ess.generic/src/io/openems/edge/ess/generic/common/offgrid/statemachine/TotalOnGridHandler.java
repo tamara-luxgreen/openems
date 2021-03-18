@@ -19,7 +19,7 @@ public class TotalOnGridHandler extends StateHandler<OffGridState, OffGridContex
 
 		this.log.info("We are in total ongrid state");
 		
-		if (context.gridDetector) {
+		if (context.offGridSwitch.getGridStatus()) {
 			return OffGridState.GROUNDSET;
 		}
 		

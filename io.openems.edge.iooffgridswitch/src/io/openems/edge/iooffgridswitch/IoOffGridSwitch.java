@@ -81,10 +81,10 @@ public class IoOffGridSwitch extends AbstractOpenemsComponent implements OffGrid
 		try {
 			inChannel1 = this.componentManager.getChannel(mainContactorChannelAddr);
 			this._setMainContactor(inChannel1.value().getOrError());
-			inChannel2 = this.componentManager.getChannel(groundingContactorChannelAddr);
-			this._setGroundingContactor(inChannel2.value().getOrError());
-			inChannel3 = this.componentManager.getChannel(gridStatusChannelAddr);
-			this._setGridStatus(inChannel3.value().getOrError());
+			inChannel2 = this.componentManager.getChannel(gridStatusChannelAddr);
+			this._setGridStatus(inChannel2.value().getOrError());
+			inChannel3 = this.componentManager.getChannel(groundingContactorChannelAddr);
+			this._setGroundingContactor(inChannel3.value().getOrError());
 		} catch (IllegalArgumentException | OpenemsNamedException e) {
 			e.printStackTrace();
 		}

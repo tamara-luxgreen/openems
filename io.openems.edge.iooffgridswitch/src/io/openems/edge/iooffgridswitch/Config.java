@@ -19,13 +19,13 @@ import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 
 	// input channel ------------------------
 	@AttributeDefinition(name = "Main contactor", description = "Input channle to control Main Contactor")
-	String digitalInput1() default "io0/DigitalInputM1C1";
+	String digitalInput1() default "io0/DigitalOutputM1C1";
 
 	@AttributeDefinition(name = "Grid detector", description = "Input channel to detect grid")
 	String digitalInput2() default "io0/DigitalInputM1C2";
 
 	@AttributeDefinition(name = "Grounding", description = "Input channel to control grounding")
-	String digitalInput3() default "io0/DigitalInputM1C3";
+	String digitalInput3() default "io0/DigitalOutputM1C3";
 
 	String webconsole_configurationFactory_nameHint() default "IO Off Grid Switch [{id}]";
 

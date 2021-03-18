@@ -22,7 +22,7 @@ public class ErrorHandler extends StateHandler<OffGridState, OffGridContext> {
 			return OffGridState.ERROR;
 		} else {
 
-			OffGridState decisionVariable = context.stateTransitionHelper();
+			OffGridState decisionVariable = context.getStateFromInputs();
 			switch (decisionVariable) {
 
 			case GROUNDSET:

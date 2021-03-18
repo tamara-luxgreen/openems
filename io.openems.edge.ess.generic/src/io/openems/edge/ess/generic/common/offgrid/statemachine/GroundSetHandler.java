@@ -31,13 +31,13 @@ public class GroundSetHandler extends StateHandler<OffGridState, OffGridContext>
 		long waitingSeconds = 0;
 
 		// isOngrid ?
-		if (!context.gridDetector) {
+		if (!context.offGridSwitch.getGridStatus()) {
 //			log.info("Going from off-grid to on-grid");
 			waitingSeconds = 65;
 		}
 
 		// isOffgrid ?
-		if (context.gridDetector) {
+		if (context.offGridSwitch.getGridStatus()) {
 
 //			log.info("Going from on-grid to off-grid");
 			waitingSeconds = 3;
@@ -53,7 +53,7 @@ public class GroundSetHandler extends StateHandler<OffGridState, OffGridContext>
 		} else {
 
 			// isOngrid ?
-			if (!context.gridDetector) {
+			if (!context.offGridSwitch.getGridStatus()) {
 				// grounding set to goto ongrid
 				context.offGridSwitch.setGroundingContactor(false);
 				context.offGridSwitch.setMainContactor(false);
@@ -61,7 +61,7 @@ public class GroundSetHandler extends StateHandler<OffGridState, OffGridContext>
 			}
 
 			// isOffgrid ?
-			if (context.gridDetector) {
+			if (context.offGridSwitch.getGridStatus()) {
 				// grounding set to goto ongrid
 				context.offGridSwitch.setGroundingContactor(true);
 				return OffGridState.TOTAL_OFFGRID;
