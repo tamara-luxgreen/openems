@@ -26,6 +26,18 @@ import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 
 	@AttributeDefinition(name = "Grounding", description = "Input channel to control grounding")
 	String digitalInput3() default "io0/DigitalOutputM1C3";
+	
+	// output channel ------------------------
+	@AttributeDefinition(name = "DigitalOutput", description = "Output channel 1")
+    String digitalOutput1() default "io0/DigitalOutputM1C1";
+	
+	@AttributeDefinition(name = "DigitalOutput", description = "Output channel 2")
+    String digitalOutput2() default "io0/DigitalOutputM1C2";
+	
+	@AttributeDefinition(name = "DigitalOutput", description = "Output channel 2")
+    String digitalOutput3() default "io0/DigitalOutputM1C3";
+	
+	
 
 	String webconsole_configurationFactory_nameHint() default "IO Off Grid Switch [{id}]";
 
