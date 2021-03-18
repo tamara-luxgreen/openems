@@ -42,9 +42,8 @@ public class IoOffGridSwitch extends AbstractOpenemsComponent implements OffGrid
 	private ChannelAddress inputGridStatusChannelAddr;
 	private ChannelAddress inputGroundingContactorChannelAddr;
 
-	public ChannelAddress outputMainContactorChannelAddr;
+	private ChannelAddress outputMainContactorChannelAddr;
 	private ChannelAddress outputGroundingContactorChannelAddr;
-	private ChannelAddress outputGridStatusChannelAddr;
 
 	@Reference
 	protected ComponentManager componentManager;
@@ -66,9 +65,8 @@ public class IoOffGridSwitch extends AbstractOpenemsComponent implements OffGrid
 		this.inputGridStatusChannelAddr = ChannelAddress.fromString(this.config.digitalInput2());
 		this.inputGroundingContactorChannelAddr = ChannelAddress.fromString(this.config.digitalInput3());
 
-		this.outputMainContactorChannelAddr = ChannelAddress.fromString(this.config.digitalInput1());
-		this.outputGridStatusChannelAddr = ChannelAddress.fromString(this.config.digitalInput2());
-		this.outputGroundingContactorChannelAddr = ChannelAddress.fromString(this.config.digitalInput3());
+		this.outputMainContactorChannelAddr = ChannelAddress.fromString(this.config.digitalOutput1());
+		this.outputGroundingContactorChannelAddr = ChannelAddress.fromString(this.config.digitalOutput3());
 	}
 
 	@Deactivate
@@ -116,5 +114,16 @@ public class IoOffGridSwitch extends AbstractOpenemsComponent implements OffGrid
 
 			}
 		}
+	}
+
+	@Override
+	public void handleWritingDigitalOutputForMainContactor(boolean value) throws IllegalArgumentException, OpenemsNamedException {
+		handleWritingDigitalOutput(this.componentManager.getChannel(outputMainContactorChannelAddr), value);
+	}
+
+	@Override
+	public void handleWritingDigitalOutputForGroundingContactor(boolean value)
+			throws IllegalArgumentException, OpenemsNamedException {
+		handleWritingDigitalOutput(this.componentManager.getChannel(outputGroundingContactorChannelAddr), value);
 	}
 }

@@ -15,8 +15,6 @@ import io.openems.edge.common.channel.BooleanReadChannel;
 import io.openems.edge.common.channel.Doc;
 import io.openems.edge.common.channel.IntegerDoc;
 import io.openems.edge.common.channel.IntegerWriteChannel;
-import io.openems.edge.common.channel.StateChannel;
-import io.openems.edge.common.channel.value.Value;
 import io.openems.edge.common.component.OpenemsComponent;
 import io.openems.edge.common.modbusslave.ModbusSlave;
 import io.openems.edge.common.startstop.StartStop;
@@ -227,8 +225,6 @@ public interface Sinexcel extends OffGridBatteryInverter, ManagedSymmetricBatter
 				.text("Fault Status")), //
 		STATE_17(Doc.of(Level.WARNING) //
 				.text("Alert Status")), //
-		STATE_ON(Doc.of(OpenemsType.BOOLEAN) //
-				.text("System is ON")), //
 		STATE_19(Doc.of(OpenemsType.BOOLEAN) //
 				.text("On Grid") //
 				.onInit(c -> { //
@@ -376,22 +372,4 @@ public interface Sinexcel extends OffGridBatteryInverter, ManagedSymmetricBatter
 	 * @return {@link StartStop}
 	 */
 	public StartStop getStartStopTarget();
-
-	/**
-	 * Gets the Channel for {@link ChannelId#STATE_ON}.
-	 * 
-	 * @return the Channel
-	 */
-	public default BooleanReadChannel getStateOnChannel() {
-		return this.channel(ChannelId.STATE_ON);
-	}
-
-	/**
-	 * Gets the {@link StateChannel} for {@link ChannelId#STATE_ON}.
-	 * 
-	 * @return the Channel {@link Value}
-	 */
-	public default Value<Boolean> getStateOn() {
-		return this.getStateOnChannel().value();
-	}
 }

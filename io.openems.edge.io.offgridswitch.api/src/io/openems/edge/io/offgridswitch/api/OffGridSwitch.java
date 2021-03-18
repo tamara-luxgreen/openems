@@ -23,19 +23,7 @@ public interface OffGridSwitch extends OpenemsComponent {
 		MAIN_CONTACTOR(Doc.of(OpenemsType.BOOLEAN)//
 				.accessMode(AccessMode.READ_ONLY)), //
 
-		/**
-		 * Set-Main-Contactor.
-		 * 
-		 * <ul>
-		 * <li>Interface: {@link OffGridSwitch}
-		 * <li>Type: Boolean
-		 * <li>Range: 0=CONTACTOR TURNED ON, 1=CONTACTOR TURNED OFF
-		 * </ul>
-		 */
-		SET_MAIN_CONTACTOR(Doc.of(OpenemsType.BOOLEAN)//
-				.accessMode(AccessMode.WRITE_ONLY)), //
-
-		/**
+			/**
 		 * Grounding-Contactor.
 		 * 
 		 * <ul>
@@ -46,18 +34,7 @@ public interface OffGridSwitch extends OpenemsComponent {
 		 */
 		GROUNDING_CONTACTOR(Doc.of(OpenemsType.BOOLEAN)//
 				.accessMode(AccessMode.READ_ONLY)), //
-		/**
-		 * Set-Grounding-Contactor.
-		 * 
-		 * <ul>
-		 * <li>Interface: {@link OffGridSwitch}
-		 * <li>Type: Boolean
-		 * <li>Range: 0=CONTACTOR TURNED ON, 1=CONTACTOR TURNED OFF
-		 * </ul>
-		 */
-		SET_GROUNDING_CONTACTOR(Doc.of(OpenemsType.BOOLEAN)//
-				.accessMode(AccessMode.WRITE_ONLY)), //
-
+		
 		/**
 		 * Grid Status.
 		 * 
@@ -111,25 +88,6 @@ public interface OffGridSwitch extends OpenemsComponent {
 		this.getMainContactorChannel().setNextValue(value);
 	}
 
-//	/**
-//	 * Gets the Channel for {@link ChannelId#SET_MAIN_CONTACTOR}.
-//	 *
-//	 * @return the Channel
-//	 */
-//	public default BooleanWriteChannel getSetMainContactorChannel() {
-//		return this.channel(ChannelId.SET_MAIN_CONTACTOR);
-//	}
-//
-//	/**
-//	 * See {@link ChannelId#SET_MAIN_CONTACTOR}.
-//	 * 
-//	 * @param optional the next write value
-//	 * @throws OpenemsNamedException on error
-//	 */
-//	public default void setMainContactor(Boolean value) throws OpenemsNamedException {
-//		this.getSetMainContactorChannel().setNextWriteValue(value);
-//	}
-
 	/**
 	 * Gets the Channel for {@link ChannelId#GROUNDING_CONTACTOR}.
 	 * 
@@ -158,24 +116,6 @@ public interface OffGridSwitch extends OpenemsComponent {
 		this.getGroundingContactorChannel().setNextValue(value);
 	}
 
-//	/**
-//	 * Gets the Channel for {@link ChannelId#SET_GROUNDING_CONTACTOR}.
-//	 *
-//	 * @return the Channel
-//	 */
-//	public default BooleanWriteChannel getSetGroundingContactorChannel() {
-//		return this.channel(ChannelId.SET_GROUNDING_CONTACTOR);
-//	}
-//
-//	/**
-//	 * See {@link ChannelId#SET_GROUNDING_CONTACTOR}.
-//	 * 
-//	 * @param value the next write value
-//	 * @throws OpenemsNamedException on error
-//	 */
-//	public default void setGroundingContactor(Boolean value) throws OpenemsNamedException {
-//		this.getSetGroundingContactorChannel().setNextWriteValue(value);
-//	}
 
 	/**
 	 * Gets the Channel for {@link ChannelId#GRID_STATUS}.
@@ -204,9 +144,11 @@ public interface OffGridSwitch extends OpenemsComponent {
 	public default void _setGridStatus(Boolean value) {
 		this.getGridStatusChannel().setNextValue(value);
 	}
-	
-	
-	public void handleWritingDigitalOutput(BooleanWriteChannel channel, boolean value) ;
-	
-	
+
+	public void handleWritingDigitalOutput(BooleanWriteChannel channel, boolean value);
+
+	public void handleWritingDigitalOutputForMainContactor(boolean value) throws IllegalArgumentException, OpenemsNamedException;
+
+	public void handleWritingDigitalOutputForGroundingContactor(boolean value) throws IllegalArgumentException, OpenemsNamedException;
+
 }

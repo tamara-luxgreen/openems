@@ -1,7 +1,5 @@
 package io.openems.edge.batteryinverter.api;
 
-import java.util.Optional;
-
 import org.osgi.annotation.versioning.ProviderType;
 
 import io.openems.common.channel.AccessMode;
@@ -12,9 +10,9 @@ import io.openems.edge.common.channel.BooleanReadChannel;
 import io.openems.edge.common.channel.BooleanWriteChannel;
 import io.openems.edge.common.channel.Channel;
 import io.openems.edge.common.channel.Doc;
-import io.openems.edge.common.channel.EnumWriteChannel;
 import io.openems.edge.common.channel.IntegerReadChannel;
 import io.openems.edge.common.channel.IntegerWriteChannel;
+import io.openems.edge.common.channel.StateChannel;
 import io.openems.edge.common.channel.value.Value;
 import io.openems.edge.common.offgrid.GridType;
 import io.openems.edge.common.startstop.StartStoppable;
@@ -75,7 +73,7 @@ public interface OffGridBatteryInverter
 		 * 
 		 * <ul>
 		 * <li>Interface: {@link OffGridBatteryInverter}
-		 * <li>Type: FalseTrue
+		 * <li>Type: Boolean
 		 * </ul>
 		 */
 		MOD_ON_CMD(Doc.of(OpenemsType.BOOLEAN) //
@@ -86,10 +84,10 @@ public interface OffGridBatteryInverter
 		 * 
 		 * <ul>
 		 * <li>Interface: {@link OffGridBatteryInverter}
-		 * <li>Type: FalseTrue
+		 * <li>Type: Boolean
 		 * </ul>
 		 */
-		MOD_OFF_CMD(Doc.of(FalseTrue.values()) //
+		MOD_OFF_CMD(Doc.of(OpenemsType.BOOLEAN) //
 				.accessMode(AccessMode.READ_WRITE)), //
 
 		/**
@@ -112,7 +110,7 @@ public interface OffGridBatteryInverter
 		 * </ul>
 		 */
 		CLEAR_FAILURE_CMD(Doc.of(OpenemsType.BOOLEAN) //
-				.accessMode(AccessMode.READ_WRITE)),
+				.accessMode(AccessMode.READ_WRITE)), //
 		/**
 		 * Inverter-State
 		 * 
@@ -122,7 +120,8 @@ public interface OffGridBatteryInverter
 		 * </ul>
 		 */
 		INVERTER_STATE(Doc.of(OpenemsType.BOOLEAN) //
-				.accessMode(AccessMode.READ_WRITE)),;
+				.text("System is ON")), //
+		;
 
 		private final Doc doc;
 
@@ -230,12 +229,8 @@ public interface OffGridBatteryInverter
 	 * @throws OpenemsNamedException on error
 	 */
 	public default void setInverterOn() throws OpenemsNamedException {
-		EnumWriteChannel setdataModOnCmd = this.channel(ChannelId.MOD_ON_CMD);
-		setdataModOnCmd.setNextWriteValue(FalseTrue.TRUE); // true = START
-
-		// TODO change the param later
-		softStart(true);
-
+		BooleanWriteChannel setdataModOnCmd = this.channel(ChannelId.MOD_ON_CMD);
+		setdataModOnCmd.setNextWriteValue(true); // true = START
 	}
 
 	/**
@@ -244,8 +239,8 @@ public interface OffGridBatteryInverter
 	 * @throws OpenemsNamedException on error
 	 */
 	public default void setInverterOff() throws OpenemsNamedException {
-		EnumWriteChannel setdataModOffCmd = this.channel(ChannelId.MOD_OFF_CMD);
-		setdataModOffCmd.setNextWriteValue(FalseTrue.TRUE); // true = STOP
+		BooleanWriteChannel setdataModOffCmd = this.channel(ChannelId.MOD_OFF_CMD);
+		setdataModOffCmd.setNextWriteValue(true); // true = STOP
 	}
 
 	/**
@@ -263,10 +258,22 @@ public interface OffGridBatteryInverter
 		setDcRelay.setNextWriteValue(switchOn ? 1 : 0);
 	}
 
-	public default boolean stateOnOff() {
-		BooleanReadChannel v = this.channel(ChannelId.INVERTER_STATE);
-		Optional<Boolean> stateOff = v.getNextValue().asOptional();
-		return stateOff.isPresent() && stateOff.get();
+	/**
+	 * Gets the Channel for {@link ChannelId#STATE_ON}.
+	 * 
+	 * @return the Channel
+	 */
+	public default BooleanReadChannel getInverterStateChannel() {
+		return this.channel(ChannelId.INVERTER_STATE);
+	}
+
+	/**
+	 * Gets the {@link StateChannel} for {@link ChannelId#STATE_ON}.
+	 * 
+	 * @return the Channel {@link Value}
+	 */
+	public default Value<Boolean> getInverterState() {
+		return this.getInverterStateChannel().value();
 	}
 
 	/**
@@ -287,13 +294,13 @@ public interface OffGridBatteryInverter
 	 * @throws OpenemsNamedException
 	 */
 	public default void setOffgridCommand() throws OpenemsNamedException {
-		EnumWriteChannel setdataGridOffCmd = this.channel(ChannelId.OFF_GRID_CMD);
-		setdataGridOffCmd.setNextWriteValue(FalseTrue.TRUE); // 1: true, other: illegal
+		BooleanWriteChannel setdataGridOffCmd = this.channel(ChannelId.OFF_GRID_CMD);
+		setdataGridOffCmd.setNextWriteValue(true); // 1: true, other: illegal
 	}
 
 	public default void setclearFailureCommand() throws OpenemsNamedException {
-		EnumWriteChannel setClearFailureCmd = this.channel(ChannelId.CLEAR_FAILURE_CMD);
-		setClearFailureCmd.setNextWriteValue(FalseTrue.TRUE); // 1: true, other: illegal
+		BooleanWriteChannel setClearFailureCmd = this.channel(ChannelId.CLEAR_FAILURE_CMD);
+		setClearFailureCmd.setNextWriteValue(true); // 1: true, other: illegal
 	}
 
 }

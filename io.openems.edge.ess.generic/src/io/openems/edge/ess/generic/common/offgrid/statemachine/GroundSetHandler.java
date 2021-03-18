@@ -24,7 +24,6 @@ public class GroundSetHandler extends StateHandler<OffGridState, OffGridContext>
 
 	@Override
 	protected OffGridState runAndGetNextState(OffGridContext context) throws OpenemsNamedException {
-
 		Instant now = Instant.now();
 
 		log.info("last attempt - now is : " + Duration.between(this.lastAttempt, now).getSeconds());
@@ -48,26 +47,26 @@ public class GroundSetHandler extends StateHandler<OffGridState, OffGridContext>
 		if (isWaitingTimePassed) {
 			// stop any matter
 			context.batteryInverter.setInverterOff();
-
-			return OffGridState.GROUNDSET;
-		} else {
+			context.batteryInverter.setInverterOff();
+			log.info("Is inverter on ? :" + context.batteryInverter.getInverterState().getOrError());
 
 			// isOngrid ?
 			if (!context.offGridSwitch.getGridStatus()) {
-				// grounding set to goto ongrid
-				//context.offGridSwitch.handleWritingDigitalOutput(context.offGridSwitch.ou,false);
-				//context.offGridSwitch.setMainContactor(false);
+				// grounding set to goto on-grid
+				context.offGridSwitch.handleWritingDigitalOutputForGroundingContactor(false);
+				context.offGridSwitch.handleWritingDigitalOutputForMainContactor(false);
 				return OffGridState.TOTAL_ONGRID;
 			}
 
 			// isOffgrid ?
 			if (context.offGridSwitch.getGridStatus()) {
-				// grounding set to goto ongrid
-				//context.offGridSwitch.setGroundingContactor(true);
+				// grounding set to goto on-grid
+				context.offGridSwitch.handleWritingDigitalOutputForGroundingContactor(true);
 				return OffGridState.TOTAL_OFFGRID;
 			}
+		}else {
+			log.info("Waiting seconds " + Duration.between(this.lastAttempt, now).getSeconds() + " seconds");
 		}
-
 		return OffGridState.GROUNDSET;
 	}
 }

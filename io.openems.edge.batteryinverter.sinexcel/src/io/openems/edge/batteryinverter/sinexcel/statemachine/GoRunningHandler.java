@@ -16,10 +16,10 @@ public class GoRunningHandler extends StateHandler<State, Context> {
 			return State.UNDEFINED;
 		}
 
-		context.softStart(true);
-		context.setInverterOn();
+		inverter.softStart(true);
+		inverter.setInverterOn();
 
-		if (inverter.getStateOn().orElse(false)) {
+		if (inverter.getInverterState().orElse(false)) {
 			// Inverter is ON
 			return State.RUNNING;
 		} else {

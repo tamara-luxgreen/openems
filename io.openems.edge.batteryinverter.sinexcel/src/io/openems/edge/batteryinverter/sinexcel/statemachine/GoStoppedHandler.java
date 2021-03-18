@@ -16,10 +16,10 @@ public class GoStoppedHandler extends StateHandler<State, Context> {
 			return State.UNDEFINED;
 		}
 
-		context.softStart(false);
-		context.setInverterOff();
+		inverter.softStart(false);
+		inverter.setInverterOff();
 
-		if (inverter.getStateOn().orElse(true)) {
+		if (inverter.getInverterState().orElse(true)) {
 			// Still waiting
 			return State.GO_STOPPED;
 		} else {
