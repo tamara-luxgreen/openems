@@ -30,20 +30,11 @@ public interface Sinexcel extends OffGridBatteryInverter, ManagedSymmetricBatter
 		RUN_FAILED(Doc.of(Level.FAULT) //
 				.text("Running the Logic failed")), //
 
-//		MOD_ON_CMD(Doc.of(FalseTrue.values()) //
-//				.accessMode(AccessMode.READ_WRITE)), //
-//		MOD_OFF_CMD(Doc.of(FalseTrue.values()) //
-//				.accessMode(AccessMode.READ_WRITE)), //
-//		CLEAR_FAILURE_CMD(Doc.of(FalseTrue.values()) //
-//				.accessMode(AccessMode.READ_WRITE)), //
-//		ON_GRID_CMD(Doc.of(FalseTrue.values()) //
-//				.accessMode(AccessMode.READ_WRITE)), //
-//		OFF_GRID_CMD(Doc.of(FalseTrue.values()) //
-//				.accessMode(AccessMode.READ_WRITE)), //
-//
-//		SET_INTERN_DC_RELAY(Doc.of(OpenemsType.INTEGER) //
-//				.accessMode(AccessMode.READ_WRITE) //
-//				.unit(Unit.NONE)),
+		CLEAR_FAILURE_CMD(Doc.of(OpenemsType.BOOLEAN) //
+				.accessMode(AccessMode.READ_WRITE)), //
+		SET_INTERN_DC_RELAY(Doc.of(OpenemsType.INTEGER) //
+				.accessMode(AccessMode.READ_WRITE) //
+				.unit(Unit.NONE)),
 
 		SET_ACTIVE_POWER(Doc.of(OpenemsType.INTEGER) //
 				.accessMode(AccessMode.READ_WRITE)), //

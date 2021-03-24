@@ -53,8 +53,8 @@ public class RunningHandler extends StateHandler<State, Context> {
 
 			if (!inverter.getInverterState().orElse(true)) {
 				// Start inverter
+				context.softStart(true);
 				inverter.setInverterOn();
-				inverter.softStart(true);
 			}
 
 			IntegerWriteChannel setActivePower = inverter.channel(Sinexcel.ChannelId.SET_ACTIVE_POWER);

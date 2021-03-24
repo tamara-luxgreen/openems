@@ -193,14 +193,14 @@ public class SinexcelImpl extends AbstractOpenemsModbusComponent implements Sine
 				new FC6WriteRegisterTask(0x028B, //
 						m(OffGridBatteryInverter.ChannelId.MOD_OFF_CMD, new UnsignedWordElement(0x028B))),
 				new FC6WriteRegisterTask(0x028C, //
-						m(OffGridBatteryInverter.ChannelId.CLEAR_FAILURE_CMD, new UnsignedWordElement(0x028C))),
+						m(Sinexcel.ChannelId.CLEAR_FAILURE_CMD, new UnsignedWordElement(0x028C))),
 				new FC6WriteRegisterTask(0x028D, //
 						m(OffGridBatteryInverter.ChannelId.ON_GRID_CMD, new UnsignedWordElement(0x028D))),
 				new FC6WriteRegisterTask(0x028E, //
 						m(OffGridBatteryInverter.ChannelId.OFF_GRID_CMD, new UnsignedWordElement(0x028E))),
 
 				new FC6WriteRegisterTask(0x0290, // FIXME: not documented!
-						m(OffGridBatteryInverter.ChannelId.SET_INTERN_DC_RELAY, new UnsignedWordElement(0x0290))),
+						m(Sinexcel.ChannelId.SET_INTERN_DC_RELAY, new UnsignedWordElement(0x0290))),
 
 				new FC6WriteRegisterTask(0x0087, //
 						m(Sinexcel.ChannelId.SET_ACTIVE_POWER, new SignedWordElement(0x0087),

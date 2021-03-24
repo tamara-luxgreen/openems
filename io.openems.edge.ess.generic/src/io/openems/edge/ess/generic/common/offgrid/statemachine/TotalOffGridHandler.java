@@ -20,8 +20,6 @@ public class TotalOffGridHandler extends StateHandler<OffGridState, OffGridConte
 			return OffGridState.GROUNDSET;
 		}
 
-		context.batteryInverter.setclearFailureCommand();
-
 		context.batteryInverter.setOffgridCommand();
 
 		// 3. Set the grid mode to Offgrid , // do this before , make it undefined

@@ -1,5 +1,6 @@
 package io.openems.edge.batteryinverter.sinexcel.statemachine;
 
+import io.openems.common.exceptions.OpenemsError.OpenemsNamedException;
 import io.openems.edge.batteryinverter.sinexcel.Sinexcel;
 import io.openems.edge.batteryinverter.sinexcel.statemachine.StateMachine.State;
 import io.openems.edge.common.statemachine.StateHandler;
@@ -7,9 +8,9 @@ import io.openems.edge.common.statemachine.StateHandler;
 public class UndefinedHandler extends StateHandler<State, Context> {
 
 	@Override
-	public State runAndGetNextState(Context context) {
+	public State runAndGetNextState(Context context) throws OpenemsNamedException {
 		Sinexcel inverter = context.getParent();
-
+		context.setclearFailureCommand();
 		switch (inverter.getStartStopTarget()) {
 		case UNDEFINED:
 			// Stuck in UNDEFINED State
