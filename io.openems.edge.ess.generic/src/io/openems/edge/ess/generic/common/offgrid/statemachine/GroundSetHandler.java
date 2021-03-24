@@ -29,18 +29,18 @@ public class GroundSetHandler extends StateHandler<OffGridState, OffGridContext>
 		log.info("last attempt - now is : " + Duration.between(this.lastAttempt, now).getSeconds());
 		long waitingSeconds = 5;
 
-//		// isOngrid ?
-//		if (!context.offGridSwitch.getGridStatus()) {
-////			log.info("Going from off-grid to on-grid");
-//			waitingSeconds = 65;
-//		}
-//
-//		// isOffgrid ?
-//		if (context.offGridSwitch.getGridStatus()) {
-//
-////			log.info("Going from on-grid to off-grid");
-//			waitingSeconds = 3;
-//		}
+		// isOngrid ?
+		if (!context.offGridSwitch.getGridStatus()) {
+//			log.info("Going from off-grid to on-grid");
+			waitingSeconds = 65;
+		}
+
+		// isOffgrid ?
+		if (context.offGridSwitch.getGridStatus()) {
+
+//			log.info("Going from on-grid to off-grid");
+			waitingSeconds = 3;
+		}
 
 		boolean isWaitingTimePassed = Duration.between(this.lastAttempt, now).getSeconds() > waitingSeconds;
 
