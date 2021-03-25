@@ -23,6 +23,7 @@ import io.openems.edge.common.event.EdgeEventConstants;
 import io.openems.edge.common.modbusslave.ModbusSlave;
 import io.openems.edge.common.startstop.StartStoppable;
 import io.openems.edge.ess.api.ManagedSymmetricEss;
+import io.openems.edge.ess.api.OffGridEss;
 import io.openems.edge.ess.api.SymmetricEss;
 import io.openems.edge.ess.generic.common.AbstractGenericEssChannelManager;
 import io.openems.edge.ess.generic.common.AbstractGenericOffGridEss;
@@ -40,7 +41,7 @@ import io.openems.edge.io.offgridswitch.api.OffGridSwitch;
 		} //
 )
 public class GenericOffGridEssImpl extends AbstractGenericOffGridEss<Battery, OffGridBatteryInverter, OffGridSwitch>
-		implements GenericManagedEss, ManagedSymmetricEss, SymmetricEss, OpenemsComponent, EventHandler, StartStoppable,
+		implements OffGridEss, ManagedSymmetricEss, SymmetricEss, OpenemsComponent, EventHandler, StartStoppable,
 		ModbusSlave {
 
 	@Reference

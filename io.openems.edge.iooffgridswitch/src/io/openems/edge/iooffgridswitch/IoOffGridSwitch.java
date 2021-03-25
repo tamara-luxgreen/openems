@@ -81,12 +81,12 @@ public class IoOffGridSwitch extends AbstractOpenemsComponent implements OffGrid
 		}
 		switch (event.getTopic()) {
 		case EdgeEventConstants.TOPIC_CYCLE_BEFORE_PROCESS_IMAGE:
-			this.handleInputOutput();
+			this.handleInput();
 			break;
 		}
 	}
 
-	public void handleInputOutput() {
+	public void handleInput() {
 		BooleanReadChannel inChannel1, inChannel2, inChannel3;
 		try {
 			inChannel1 = this.componentManager.getChannel(inputMainContactorChannelAddr);
