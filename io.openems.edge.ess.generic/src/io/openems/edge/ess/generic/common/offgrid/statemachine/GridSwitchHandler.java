@@ -10,10 +10,10 @@ import io.openems.common.exceptions.OpenemsError.OpenemsNamedException;
 import io.openems.edge.common.statemachine.StateHandler;
 import io.openems.edge.ess.generic.common.offgrid.statemachine.OffGridStateMachine.OffGridState;
 
-public class GroundSetHandler extends StateHandler<OffGridState, OffGridContext> {
+public class GridSwitchHandler extends StateHandler<OffGridState, OffGridContext> {
 
 	private Instant lastAttempt = Instant.MIN;
-	private final Logger log = LoggerFactory.getLogger(GroundSetHandler.class);
+	private final Logger log = LoggerFactory.getLogger(GridSwitchHandler.class);
 
 	@Override
 	protected void onEntry(OffGridContext context) throws OpenemsNamedException {
@@ -55,18 +55,18 @@ public class GroundSetHandler extends StateHandler<OffGridState, OffGridContext>
 				// grounding set to goto on-grid
 				context.offGridSwitch.handleWritingDigitalOutputForGroundingContactor(false);
 				context.offGridSwitch.handleWritingDigitalOutputForMainContactor(false);
-				return OffGridState.TOTAL_ONGRID;
+				return OffGridState.START_BATTERY_IN_ON_GRID;
 			}
 
 			// isOffgrid ?
 			if (context.offGridSwitch.getGridStatus()) {
 				// grounding set to goto on-grid
 				context.offGridSwitch.handleWritingDigitalOutputForGroundingContactor(true);
-				return OffGridState.TOTAL_OFFGRID;
+				return OffGridState.START_BATTERY_IN_OFF_GRID;
 			}
 		}else {
 			log.info("Waiting seconds " + Duration.between(this.lastAttempt, now).getSeconds() + " seconds");
 		}
-		return OffGridState.GROUNDSET;
+		return OffGridState.GRID_SWITCH;
 	}
 }

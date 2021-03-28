@@ -36,7 +36,7 @@ public class OffGridContext extends Context {
 					// 1 1 0
 					// total offgrid
 					// System.out.println(" one " + State.TOTAL_OFFGRID);
-					return OffGridState.TOTAL_OFFGRID;
+					return OffGridState.START_BATTERY_IN_OFF_GRID;
 				}
 			} else {
 				// main is false, main contactor is closed
@@ -44,11 +44,11 @@ public class OffGridContext extends Context {
 					// 0 1 1
 					// We are going to off grid
 					// System.out.println(" one " + State.GROUNDSET);
-					return OffGridState.GROUNDSET;
+					return OffGridState.UNDEFINED;
 				} else {
 					// 0 1 0
 					// System.out.println(" one " + State.ERROR);
-					return OffGridState.GROUNDSET;
+					return OffGridState.UNDEFINED;
 				}
 			}
 		} else {
@@ -57,22 +57,22 @@ public class OffGridContext extends Context {
 				if (offGridSwitch.getGroundingContactor()) {
 					// 1 0 1
 					// System.out.println(" one " + State.GROUNDSET);
-					return OffGridState.GROUNDSET;
+					return OffGridState.UNDEFINED;
 				} else {
-					// 0 1 0
+					// 1 0 0
 					// System.out.println(" one " + State.ERROR);
-					return OffGridState.GROUNDSET;
+					return OffGridState.UNDEFINED;
 				}
 
 			} else {
 				if (offGridSwitch.getGroundingContactor()) {
 					// 0 0 1
 					// System.out.println(" one " + State.TOTAL_ONGRID);
-					return OffGridState.TOTAL_ONGRID;
+					return OffGridState.START_BATTERY_IN_ON_GRID;
 				} else {
 					// 0 0 0
 					// System.out.println(" one " + State.GROUNDSET);
-					return OffGridState.GROUNDSET;
+					return OffGridState.UNDEFINED;
 
 				}
 			}
