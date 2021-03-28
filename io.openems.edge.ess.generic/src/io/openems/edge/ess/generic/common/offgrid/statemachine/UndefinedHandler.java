@@ -9,6 +9,7 @@ public class UndefinedHandler extends StateHandler<OffGridState, OffGridContext>
 	@Override
 	public OffGridState runAndGetNextState(OffGridContext context) {
 		GenericManagedEss ess = context.getParent();
+		
 		switch (ess.getStartStopTarget()) {
 		case UNDEFINED:
 			// Stuck in UNDEFINED State

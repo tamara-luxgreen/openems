@@ -32,8 +32,6 @@ import io.openems.edge.ess.api.SymmetricEss;
 import io.openems.edge.ess.generic.common.offgrid.statemachine.OffGridContext;
 import io.openems.edge.ess.generic.common.offgrid.statemachine.OffGridStateMachine;
 import io.openems.edge.ess.generic.common.offgrid.statemachine.OffGridStateMachine.OffGridState;
-import io.openems.edge.ess.generic.common.statemachine.StateMachine;
-import io.openems.edge.ess.generic.common.statemachine.StateMachine.State;
 import io.openems.edge.ess.power.api.Constraint;
 import io.openems.edge.ess.power.api.Phase;
 import io.openems.edge.ess.power.api.Pwr;
@@ -55,11 +53,6 @@ public abstract class AbstractGenericOffGridEss<BATTERY extends Battery, BATTERY
 	 * Manages the {@link OffGridState}s of the StateMachine.
 	 */
 	private final OffGridStateMachine offGridStateMachine = new OffGridStateMachine(OffGridState.UNDEFINED);
-
-	/**
-	 * Manages the {@link State}s of the StateMachine.
-	 */
-	private final StateMachine stateMachine = new StateMachine(State.UNDEFINED);
 
 	/**
 	 * Helper wrapping class to handle everything related to Channels.
@@ -134,21 +127,19 @@ public abstract class AbstractGenericOffGridEss<BATTERY extends Battery, BATTERY
 	 */
 	private void handleStateMachine() {
 		// Store the current State
-		this.channel(GenericManagedEss.ChannelId.STATE_MACHINE).setNextValue(this.stateMachine.getCurrentState());
+		this.channel(GenericManagedEss.ChannelId.STATE_MACHINE)
+				.setNextValue(this.offGridStateMachine.getCurrentState());
 
 		// Initialize 'Start-Stop' Channel
 		this._setStartStop(StartStop.UNDEFINED);
-		
+
 		// Prepare Context
 		OffGridContext context = new OffGridContext(this, this.getBattery(), this.getBatteryInverter(),
 				this.getOffGridSwitch());
-
 		// Call the StateMachine
 		try {
 
 			this.offGridStateMachine.run(context);
-
-			this.stateMachine.run(context);
 
 			this.channel(GenericManagedEss.ChannelId.RUN_FAILED).setNextValue(false);
 		} catch (OpenemsNamedException e) {
@@ -222,7 +213,7 @@ public abstract class AbstractGenericOffGridEss<BATTERY extends Battery, BATTERY
 	public void setStartStop(StartStop value) {
 		if (this.startStopTarget.getAndSet(value) != value) {
 			// Set only if value changed
-			this.stateMachine.forceNextState(State.UNDEFINED);
+			this.offGridStateMachine.forceNextState(OffGridState.UNDEFINED);
 		}
 	}
 

@@ -204,8 +204,8 @@ public interface OffGridBatteryInverter
 	 * @throws OpenemsNamedException
 	 */
 	public default void setOngridCommand() throws OpenemsNamedException {
-		BooleanWriteChannel setdataGridOffCmd = this.channel(ChannelId.ON_GRID_CMD);
-		setdataGridOffCmd.setNextWriteValue(true); // 1: true, other: illegal
+		BooleanWriteChannel setdataGridOnCmd = this.channel(ChannelId.ON_GRID_CMD);
+		setdataGridOnCmd.setNextWriteValue(true); // 1: true, other: illegal
 	}
 
 	/**

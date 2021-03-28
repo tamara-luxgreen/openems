@@ -24,10 +24,9 @@ public class OffGridStateMachine extends AbstractStateMachine<OffGridStateMachin
 		STOP_BATTERY(31), //
 		STOPPED(32), //
 
-		
 		STOP_BATTERY_INVERTER_BEFORE_SWITCH(40), //
-		GRID_SWITCH(41),//
-		
+		GRID_SWITCH(41), //
+
 		ERROR(50), //
 		; //
 
@@ -66,31 +65,31 @@ public class OffGridStateMachine extends AbstractStateMachine<OffGridStateMachin
 	public StateHandler<OffGridState, OffGridContext> getStateHandler(OffGridState state) {
 		switch (state) {
 		case UNDEFINED:
-			break;
+			return new UndefinedHandler();
 		case STARTED_IN_OFF_GRID:
-			break;
+			return new StartedInOffGridHandler();
 		case STARTED_IN_ON_GRID:
-			break;
+			return new StartedInOnGridHandler();
 		case START_BATTERY_INVERTER_IN_OFF_GRID:
-			break;
+			return new StartBatteryInverterInOffGridHandler();
 		case START_BATTERY_INVERTER_IN_ON_GRID:
-			break;
+			return new StartBatteryInverterInOnGridHandler();
 		case START_BATTERY_IN_OFF_GRID:
-			break;
+			return new StartBatteryInOffGridHandler();
 		case START_BATTERY_IN_ON_GRID:
-			break;
+			return new StartBatteryInOnGridHandler();
 		case STOPPED:
-			break;
+			return new StoppedHandler();
 		case STOP_BATTERY:
-			break;
+			return new StopBatteryHandler();
 		case STOP_BATTERY_INVERTER:
-			break;
+			return new StopBatteryInverterHandler();
 		case STOP_BATTERY_INVERTER_BEFORE_SWITCH:
-			break;
+			return new StopBatteryInverterBeforeSwitch();
 		case ERROR:
-			break;
+			return new ErrorHandler();
 		case GRID_SWITCH:
-			break;
+			return new GridSwitchHandler();
 		}
 
 		throw new IllegalArgumentException("Unknown State [" + state + "]");
