@@ -8,7 +8,7 @@ import io.openems.edge.common.statemachine.StateHandler;
 import io.openems.edge.ess.generic.common.GenericManagedEss;
 import io.openems.edge.ess.generic.common.offgrid.statemachine.OffGridStateMachine.OffGridState;
 
-public class StopBatteryInverterBeforeSwitch extends StateHandler<OffGridState, OffGridContext> {
+public class StopBatteryInverterBeforeSwitchHandler extends StateHandler<OffGridState, OffGridContext> {
 
 	private Instant lastAttempt = Instant.MIN;
 	private int attemptCounter = 0;

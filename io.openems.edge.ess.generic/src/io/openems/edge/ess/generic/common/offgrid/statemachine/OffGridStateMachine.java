@@ -85,7 +85,7 @@ public class OffGridStateMachine extends AbstractStateMachine<OffGridStateMachin
 		case STOP_BATTERY_INVERTER:
 			return new StopBatteryInverterHandler();
 		case STOP_BATTERY_INVERTER_BEFORE_SWITCH:
-			return new StopBatteryInverterBeforeSwitch();
+			return new StopBatteryInverterBeforeSwitchHandler();
 		case ERROR:
 			return new ErrorHandler();
 		case GRID_SWITCH:
