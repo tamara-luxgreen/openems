@@ -1,7 +1,5 @@
 package io.openems.edge.batteryinverter.sinexcel.statemachine;
 
-import java.time.Instant;
-
 import io.openems.common.exceptions.OpenemsError.OpenemsNamedException;
 import io.openems.edge.batteryinverter.sinexcel.Sinexcel;
 import io.openems.edge.batteryinverter.sinexcel.statemachine.StateMachine.State;
@@ -11,14 +9,14 @@ import io.openems.edge.common.statemachine.StateHandler;
 
 public class RunningHandler extends StateHandler<State, Context> {
 
-	private final static int POWER_SAVING_MODE_SECONDS = 60;
+//	private final static int POWER_SAVING_MODE_SECONDS = 60;
 
-	private Instant noPowerSince = null;
+//	private Instant noPowerSince = null;
 
-	@Override
-	protected void onEntry(Context context) throws OpenemsNamedException {
-		this.noPowerSince = null;
-	}
+//	@Override
+//	protected void onEntry(Context context) throws OpenemsNamedException {
+//		this.noPowerSince = null;
+//	}
 
 	@Override
 	public State runAndGetNextState(Context context) throws OpenemsNamedException {
@@ -50,7 +48,7 @@ public class RunningHandler extends StateHandler<State, Context> {
 
 		if (context.setActivePower != 0 || context.setReactivePower != 0) {
 			// Apply power setpoints
-			this.noPowerSince = null;
+//			this.noPowerSince = null;
 
 			IntegerWriteChannel setActivePower = inverter.channel(Sinexcel.ChannelId.SET_ACTIVE_POWER);
 			setActivePower.setNextWriteValue(context.setActivePower/ 100);
@@ -74,5 +72,4 @@ public class RunningHandler extends StateHandler<State, Context> {
 //		}
 
 	}
-
 }

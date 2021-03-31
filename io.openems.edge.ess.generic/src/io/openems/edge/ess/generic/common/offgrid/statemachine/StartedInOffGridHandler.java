@@ -49,20 +49,15 @@ public class StartedInOffGridHandler extends StateHandler<OffGridState, OffGridC
 			if (isWaitingTimePassed) {
 				context.batteryInverter.setOffgridCommand(false);
 				return OffGridState.STOP_BATTERY_INVERTER_BEFORE_SWITCH;
-			}else {
-
-				// Mark as started
+			} else {
 				context.getParent()._setGridMode(GridMode.UNDEFINED);
 				return OffGridState.STARTED_IN_OFF_GRID;
 			}
-			
 		}
-
 		ess._setStartStop(StartStop.START);
 		context.batteryInverter.setOffgridCommand(true);
 		context.batteryInverter.setOffGridFrequency(52);
 		context.getParent()._setGridMode(GridMode.OFF_GRID);
 		return OffGridState.STOP_BATTERY_INVERTER_BEFORE_SWITCH;
 	}
-
 }

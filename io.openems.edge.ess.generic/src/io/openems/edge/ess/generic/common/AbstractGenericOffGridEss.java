@@ -74,6 +74,9 @@ public abstract class AbstractGenericOffGridEss<BATTERY extends Battery, BATTERY
 
 	private StartStopConfig startStopConfig = StartStopConfig.AUTO;
 
+	private int allowedMinSocInOffGrid;
+	private int allowedMinCellVoltageInOffGrid;
+
 	protected AbstractGenericOffGridEss(io.openems.edge.common.channel.ChannelId[] firstInitialChannelIds,
 			io.openems.edge.common.channel.ChannelId[]... furtherInitialChannelIds) {
 		super(firstInitialChannelIds, furtherInitialChannelIds);
@@ -86,7 +89,7 @@ public abstract class AbstractGenericOffGridEss<BATTERY extends Battery, BATTERY
 
 	protected void activate(ComponentContext context, String id, String alias, boolean enabled,
 			StartStopConfig startStopConfig, ConfigurationAdmin cm, String batteryInverterId, String batteryId,
-			String ioOffGridSwitchId) {
+			String ioOffGridSwitchId, int allowedMinSocInOffGrid, int allowedMinCellVoltageInOffGrid) {
 		super.activate(context, id, alias, enabled);
 		this.startStopConfig = startStopConfig;
 
@@ -104,6 +107,8 @@ public abstract class AbstractGenericOffGridEss<BATTERY extends Battery, BATTERY
 		if (OpenemsComponent.updateReferenceFilter(cm, this.servicePid(), "offGridSwitch", ioOffGridSwitchId)) {
 			return;
 		}
+		this.allowedMinSocInOffGrid = allowedMinSocInOffGrid;
+		this.allowedMinCellVoltageInOffGrid = allowedMinCellVoltageInOffGrid;
 		this.getChannelManager().activate(this.getComponentManager(), this.getBattery(), this.getBatteryInverter());
 	}
 
@@ -139,7 +144,7 @@ public abstract class AbstractGenericOffGridEss<BATTERY extends Battery, BATTERY
 
 		// Prepare Context
 		OffGridContext context = new OffGridContext(this, this.getBattery(), this.getBatteryInverter(),
-				this.getOffGridSwitch());
+				this.getOffGridSwitch(), this.allowedMinSocInOffGrid, this.allowedMinCellVoltageInOffGrid);
 		// Call the StateMachine
 		try {
 
@@ -159,7 +164,6 @@ public abstract class AbstractGenericOffGridEss<BATTERY extends Battery, BATTERY
 				+ "|Allowed:" //
 				+ this.getAllowedChargePower().asStringWithoutUnit() + ";" //
 				+ this.getAllowedDischargePower().asString() //
-				+ "|" + this.channel(GenericManagedEss.ChannelId.STATE_MACHINE).value().asOptionString() //
 				+ "|" + this.channel(GenericManagedEss.ChannelId.OFF_GRID_STATE_MACHINE).value().asOptionString();
 	}
 

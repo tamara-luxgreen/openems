@@ -10,12 +10,17 @@ public class OffGridContext extends Context {
 	protected final Battery battery;
 	protected final OffGridBatteryInverter batteryInverter;
 	protected final OffGridSwitch offGridSwitch;
+	protected final int allowedMinSocInOffGrid;
+	protected final int allowedMinCellVoltageInOffGrid;
+
 
 	public OffGridContext(GenericManagedEss parent, Battery battery, OffGridBatteryInverter batteryInverter,
-			OffGridSwitch offGridSwitch) {
+			OffGridSwitch offGridSwitch, int allowedMinSocInOffGrid, int allowedMinCellVoltageInOffGrid) {
 		super(parent, battery, batteryInverter);
 		this.batteryInverter = batteryInverter;
 		this.offGridSwitch = offGridSwitch;
 		this.battery = battery;
+		this.allowedMinSocInOffGrid = allowedMinSocInOffGrid;
+		this.allowedMinCellVoltageInOffGrid = allowedMinCellVoltageInOffGrid;
 	}
 }

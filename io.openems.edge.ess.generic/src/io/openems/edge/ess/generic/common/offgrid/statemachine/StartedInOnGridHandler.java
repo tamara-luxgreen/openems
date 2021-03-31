@@ -25,7 +25,7 @@ public class StartedInOnGridHandler extends StateHandler<OffGridState, OffGridCo
 		GenericManagedEss ess = context.getParent();
 
 		Instant now = Instant.now();
-		//Just hard coded 3 sec waiting
+		// Just hard coded 3 sec waiting
 		long waitingSeconds = 3;
 
 		if (ess.hasFaults()) {
@@ -50,14 +50,12 @@ public class StartedInOnGridHandler extends StateHandler<OffGridState, OffGridCo
 				return OffGridState.STOP_BATTERY_INVERTER_BEFORE_SWITCH;
 			} else {
 
-			
-			context.getParent()._setGridMode(GridMode.UNDEFINED);			
-			return OffGridState.STARTED_IN_ON_GRID;
+				context.getParent()._setGridMode(GridMode.UNDEFINED);
+				return OffGridState.STARTED_IN_ON_GRID;
 			}
-			}
+		}
 		context.batteryInverter.setOngridCommand(true);
-
-		context.getParent()._setGridMode(GridMode.ON_GRID);			
+		context.getParent()._setGridMode(GridMode.ON_GRID);
 		ess._setStartStop(StartStop.START);
 		return OffGridState.STARTED_IN_ON_GRID;
 

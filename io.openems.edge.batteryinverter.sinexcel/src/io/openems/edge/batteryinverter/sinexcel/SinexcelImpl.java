@@ -164,12 +164,6 @@ public class SinexcelImpl extends AbstractOpenemsModbusComponent implements Sine
 	 * @throws OpenemsNamedException on error
 	 */
 	private void setBatteryLimits(Battery battery) throws OpenemsNamedException {
-		
-		
-	
-		
-		
-		
 		// Discharge Min Voltage
 		IntegerWriteChannel dischargeMinVoltageChannel = this.channel(Sinexcel.ChannelId.DISCHARGE_MIN_V);
 		Integer dischargeMinVoltage = battery.getDischargeMinVoltage().get();

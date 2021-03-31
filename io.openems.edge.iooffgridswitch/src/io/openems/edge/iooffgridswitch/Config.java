@@ -32,7 +32,7 @@ import org.osgi.service.metatype.annotations.ObjectClassDefinition;
     String digitalOutput1() default "io0/DigitalOutputM1C1";
 	
 	@AttributeDefinition(name = "Digital Output Grounding Control Relay", description = "Output channel of grounding control relay")
-    String digitalOutput3() default "io0/DigitalOutputM1C3";
+    String digitalOutput3() default "io0/DigitalOutputM1C2";
 
 	String webconsole_configurationFactory_nameHint() default "IO Off Grid Switch [{id}]";
 
