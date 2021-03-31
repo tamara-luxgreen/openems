@@ -155,8 +155,8 @@ public class SinexcelImpl extends AbstractOpenemsModbusComponent implements Sine
 
 	
 
-	private float lastAllowedChargePower = 0;
-	private float lastAllowedDischargePower = 0;
+//	private float lastAllowedChargePower = 0;
+//	private float lastAllowedDischargePower = 0;
 	/**
 	 * Sets the Battery Limits.
 	 * 
@@ -166,110 +166,33 @@ public class SinexcelImpl extends AbstractOpenemsModbusComponent implements Sine
 	private void setBatteryLimits(Battery battery) throws OpenemsNamedException {
 		
 		
-		
-		final float efficiencyFactor = 0.95F;
-		final int disMaxA;
-		final int chaMaxA;
-		final int disMinV;
-		final int chaMaxV;
-		final int voltage;
-
-		// Evaluate input data
-		if (battery == null) {
-			disMaxA = 0;
-			chaMaxA = 0;
-			disMinV = 0;
-			chaMaxV = 0;
-			voltage = 0;
-		} else {
-			disMaxA = battery.getDischargeMaxCurrent().orElse(0);
-			chaMaxA = battery.getChargeMaxCurrent().orElse(0);
-			disMinV = battery.getDischargeMinVoltage().orElse(0);
-			chaMaxV = battery.getChargeMaxVoltage().orElse(0);
-			voltage = battery.getVoltage().orElse(0);
-		}
-
-		// Set Inverter Registers
-		{
-			IntegerWriteChannel chargeMaxCurrentChannel = this.channel(Sinexcel.ChannelId.CHARGE_MAX_A);
-			chargeMaxCurrentChannel.setNextWriteValue(//
-					/* enforce positive */ Math.max(0, //
-							/* apply max current */ Math.min(MAX_CURRENT, chaMaxA) //
-					) * 10);
-		}
-		{
-			IntegerWriteChannel dischargeMaxCurrentChannel = this.channel(Sinexcel.ChannelId.DISCHARGE_MAX_A);
-			dischargeMaxCurrentChannel.setNextWriteValue(//
-					/* enforce positive */ Math.max(0, //
-							/* apply max current */ Math.min(MAX_CURRENT, disMaxA) //
-					) * 10);
-		}
-		{
-			IntegerWriteChannel dischargeMinVoltageChannel = this.channel(Sinexcel.ChannelId.DISCHARGE_MIN_V);
-			dischargeMinVoltageChannel.setNextWriteValue(disMinV * 10);
-		}
-		{
-			IntegerWriteChannel chargeMaxVoltageChannel = this.channel(Sinexcel.ChannelId.CHARGE_MAX_V);
-			chargeMaxVoltageChannel.setNextWriteValue(chaMaxV * 10);
-		}
-
-		// Calculate AllowedCharge- and -DischargePower
-		float allowedChargePower;
-		float allowedDischargePower;
-
-		// efficiency factor is not considered in chargeMaxCurrent (DC Power > AC Power)
-		allowedChargePower = chaMaxA * voltage * -1;
-		allowedDischargePower = disMaxA * voltage * efficiencyFactor;
-
-		// Allow max increase of 1 %
-		if (allowedDischargePower > lastAllowedDischargePower + allowedDischargePower * 0.01F) {
-			allowedDischargePower = lastAllowedDischargePower + allowedDischargePower * 0.01F;
-		}
-		this.lastAllowedDischargePower = allowedDischargePower;
-
-		if (allowedChargePower < lastAllowedChargePower + allowedChargePower * 0.01F) {
-			allowedChargePower = lastAllowedChargePower + allowedChargePower * 0.01F;
-		}
-		this.lastAllowedChargePower = allowedChargePower;
-
-		// Make sure solution is feasible
-		if (allowedChargePower > allowedDischargePower) { // Force Discharge
-			allowedDischargePower = allowedChargePower;
-		}
-		if (allowedDischargePower < allowedChargePower) { // Force Charge
-			allowedChargePower = allowedDischargePower;
-		}
-
-		//this._setAllowedChargePower(Math.round(allowedChargePower));
-		//this._setAllowedDischargePower(Math.round(allowedDischargePower));
+	
 		
 		
 		
-		
-		
-//		// Discharge Min Voltage
-//		IntegerWriteChannel dischargeMinVoltageChannel = this.channel(Sinexcel.ChannelId.DISCHARGE_MIN_V);
-//		Integer dischargeMinVoltage = battery.getDischargeMinVoltage().get();
-//		dischargeMinVoltageChannel.setNextWriteValue(dischargeMinVoltage);
-//		// Charge Max Voltage
-//		IntegerWriteChannel chargeMaxVoltageChannel = this.channel(Sinexcel.ChannelId.CHARGE_MAX_V);
-//		Integer chargeMaxVoltage = battery.getChargeMaxVoltage().get();
-//		chargeMaxVoltageChannel.setNextWriteValue(chargeMaxVoltage);
-//
-//		// Discharge Max Current
-//		// negative value is corrected as zero
-//		IntegerWriteChannel dischargeMaxCurrentChannel = this.channel(Sinexcel.ChannelId.DISCHARGE_MAX_A);
-//		dischargeMaxCurrentChannel.setNextWriteValue(//
-//				/* enforce positive */ Math.max(0, //
-//						/* apply max current */ Math.min(MAX_CURRENT, battery.getDischargeMaxCurrent().orElse(0)) //
-//				));
-//		// Charge Max Current
-//		// negative value is corrected as zero
-//		IntegerWriteChannel chargeMaxCurrentChannel = this.channel(Sinexcel.ChannelId.CHARGE_MAX_A);
-//		chargeMaxCurrentChannel.setNextWriteValue(//
-//				/* enforce positive */ Math.max(0, //
-//						/* apply max current */ Math.min(MAX_CURRENT, battery.getChargeMaxCurrent().orElse(0)) //
-//				));
+		// Discharge Min Voltage
+		IntegerWriteChannel dischargeMinVoltageChannel = this.channel(Sinexcel.ChannelId.DISCHARGE_MIN_V);
+		Integer dischargeMinVoltage = battery.getDischargeMinVoltage().get();
+		dischargeMinVoltageChannel.setNextWriteValue(dischargeMinVoltage);
+		// Charge Max Voltage
+		IntegerWriteChannel chargeMaxVoltageChannel = this.channel(Sinexcel.ChannelId.CHARGE_MAX_V);
+		Integer chargeMaxVoltage = battery.getChargeMaxVoltage().get();
+		chargeMaxVoltageChannel.setNextWriteValue(chargeMaxVoltage);
+
+		// Discharge Max Current
+		// negative value is corrected as zero
+		IntegerWriteChannel dischargeMaxCurrentChannel = this.channel(Sinexcel.ChannelId.DISCHARGE_MAX_A);
+		dischargeMaxCurrentChannel.setNextWriteValue(//
+				/* enforce positive */ Math.max(0, //
+						/* apply max current */ Math.min(MAX_CURRENT, battery.getDischargeMaxCurrent().orElse(0)) //
+				));
+		// Charge Max Current
+		// negative value is corrected as zero
+		IntegerWriteChannel chargeMaxCurrentChannel = this.channel(Sinexcel.ChannelId.CHARGE_MAX_A);
+		chargeMaxCurrentChannel.setNextWriteValue(//
+				/* enforce positive */ Math.max(0, //
+						/* apply max current */ Math.min(MAX_CURRENT, battery.getChargeMaxCurrent().orElse(0)) //
+				));
 	}
 
 	protected ModbusProtocol defineModbusProtocol() throws OpenemsException {
