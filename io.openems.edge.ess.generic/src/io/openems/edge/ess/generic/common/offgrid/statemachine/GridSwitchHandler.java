@@ -1,6 +1,7 @@
 package io.openems.edge.ess.generic.common.offgrid.statemachine;
 
 import java.time.Instant;
+import java.util.Objects;
 
 import io.openems.common.exceptions.OpenemsError.OpenemsNamedException;
 import io.openems.edge.common.statemachine.StateHandler;
@@ -34,12 +35,13 @@ public class GridSwitchHandler extends StateHandler<OffGridState, OffGridContext
 			context.offGridSwitch.handleWritingDigitalOutputForMainContactor(false);
 			return OffGridState.START_BATTERY_IN_ON_GRID;
 		}
-
+		
 		// isOffgrid ?
 		if (context.offGridSwitch.getGridStatus()) {
 			// grounding set to goto on-grid
-			if (context.battery.getSoc().getOrError() > 5 || context.battery.getMinCellVoltage().getOrError() > 3) {
-				context.offGridSwitch.handleWritingDigitalOutputForMainContactor(true);
+			if (context.battery.getSoc().get() > 5 && context.battery.getMinCellVoltage().get()> 2) {
+				
+				context.offGridSwitch.handleWritingDigitalOutputForMainContactor(false);
 				context.offGridSwitch.handleWritingDigitalOutputForGroundingContactor(true);
 				return OffGridState.START_BATTERY_IN_OFF_GRID;
 			} else {

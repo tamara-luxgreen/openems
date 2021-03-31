@@ -27,7 +27,7 @@ public class ErrorHandler extends StateHandler<State, Context> {
 		}
 
 		// Wait
-		return State.ERROR;
+		return State.GO_STOPPED;
 	}
 
 }

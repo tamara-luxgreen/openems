@@ -11,10 +11,6 @@ public class GoRunningHandler extends StateHandler<State, Context> {
 	public State runAndGetNextState(Context context) throws OpenemsNamedException {
 		Sinexcel inverter = context.getParent();
 
-		// Has Faults -> abort
-		if (inverter.hasFaults()) {
-			return State.UNDEFINED;
-		}
 
 		context.softStart(true);
 		inverter.setInverterOn();

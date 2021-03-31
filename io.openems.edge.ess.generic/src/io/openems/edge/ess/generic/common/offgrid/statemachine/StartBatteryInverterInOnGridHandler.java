@@ -43,7 +43,7 @@ public class StartBatteryInverterInOnGridHandler extends StateHandler<OffGridSta
 			} else {
 				// Trying to start Battery
 				context.batteryInverter.start();
-				context.batteryInverter.setOngridCommand();
+				context.batteryInverter.setOngridCommand(true);
 				context.getParent()._setGridMode(GridMode.ON_GRID);
 				this.lastAttempt = Instant.now();
 				this.attemptCounter++;

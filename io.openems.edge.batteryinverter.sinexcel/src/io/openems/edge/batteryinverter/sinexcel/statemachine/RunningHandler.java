@@ -23,9 +23,9 @@ public class RunningHandler extends StateHandler<State, Context> {
 	@Override
 	public State runAndGetNextState(Context context) throws OpenemsNamedException {
 		Sinexcel inverter = context.getParent();
-
-		if (inverter.hasFaults() || !inverter.getInverterState().orElse(true)) {
-			return State.UNDEFINED;
+		context.setclearFailureCommand();
+		if ( inverter.hasFaults() || !inverter.getInverterState().orElse(true)) {
+					return State.UNDEFINED;
 		}
 
 		// Mark as started
