@@ -127,7 +127,7 @@ public abstract class AbstractGenericOffGridEss<BATTERY extends Battery, BATTERY
 	 */
 	private void handleStateMachine() {
 		// Store the current State
-		this.channel(GenericManagedEss.ChannelId.STATE_MACHINE)
+		this.channel(GenericManagedEss.ChannelId.OFF_GRID_STATE_MACHINE)
 				.setNextValue(this.offGridStateMachine.getCurrentState());
 
 		// Initialize 'Start-Stop' Channel
@@ -155,7 +155,7 @@ public abstract class AbstractGenericOffGridEss<BATTERY extends Battery, BATTERY
 				+ "|Allowed:" //
 				+ this.getAllowedChargePower().asStringWithoutUnit() + ";" //
 				+ this.getAllowedDischargePower().asString() //
-				+ "|" + this.channel(GenericManagedEss.ChannelId.STATE_MACHINE).value().asOptionString();
+				+ "|" + this.channel(GenericManagedEss.ChannelId.OFF_GRID_STATE_MACHINE).value().asOptionString();
 	}
 
 	/**

@@ -14,6 +14,7 @@ import io.openems.edge.common.startstop.StartStop;
 import io.openems.edge.common.startstop.StartStoppable;
 import io.openems.edge.ess.api.ManagedSymmetricEss;
 import io.openems.edge.ess.api.SymmetricEss;
+import io.openems.edge.ess.generic.common.offgrid.statemachine.OffGridStateMachine.OffGridState;
 import io.openems.edge.ess.generic.common.statemachine.StateMachine.State;
 
 public interface GenericManagedEss extends ManagedSymmetricEss, StartStoppable, ModbusSlave {
@@ -37,6 +38,8 @@ public interface GenericManagedEss extends ManagedSymmetricEss, StartStoppable, 
 
 	public enum ChannelId implements io.openems.edge.common.channel.ChannelId {
 		STATE_MACHINE(Doc.of(State.values()) //
+				.text("Current State of State-Machine")), //
+		OFF_GRID_STATE_MACHINE(Doc.of(OffGridState.values()) //
 				.text("Current State of State-Machine")), //
 		RUN_FAILED(Doc.of(Level.FAULT) //
 				.text("Running the Logic failed")), //

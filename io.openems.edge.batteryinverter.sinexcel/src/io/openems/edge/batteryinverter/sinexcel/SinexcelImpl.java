@@ -153,6 +153,10 @@ public class SinexcelImpl extends AbstractOpenemsModbusComponent implements Sine
 		}
 	}
 
+	
+
+	private float lastAllowedChargePower = 0;
+	private float lastAllowedDischargePower = 0;
 	/**
 	 * Sets the Battery Limits.
 	 * 
@@ -160,29 +164,112 @@ public class SinexcelImpl extends AbstractOpenemsModbusComponent implements Sine
 	 * @throws OpenemsNamedException on error
 	 */
 	private void setBatteryLimits(Battery battery) throws OpenemsNamedException {
-		// Discharge Min Voltage
-		IntegerWriteChannel dischargeMinVoltageChannel = this.channel(Sinexcel.ChannelId.DISCHARGE_MIN_V);
-		Integer dischargeMinVoltage = battery.getDischargeMinVoltage().get();
-		dischargeMinVoltageChannel.setNextWriteValue(dischargeMinVoltage);
-		// Charge Max Voltage
-		IntegerWriteChannel chargeMaxVoltageChannel = this.channel(Sinexcel.ChannelId.CHARGE_MAX_V);
-		Integer chargeMaxVoltage = battery.getChargeMaxVoltage().get();
-		chargeMaxVoltageChannel.setNextWriteValue(chargeMaxVoltage);
+		
+		
+		
+		final float efficiencyFactor = 0.95F;
+		final int disMaxA;
+		final int chaMaxA;
+		final int disMinV;
+		final int chaMaxV;
+		final int voltage;
 
-		// Discharge Max Current
-		// negative value is corrected as zero
-		IntegerWriteChannel dischargeMaxCurrentChannel = this.channel(Sinexcel.ChannelId.DISCHARGE_MAX_A);
-		dischargeMaxCurrentChannel.setNextWriteValue(//
-				/* enforce positive */ Math.max(0, //
-						/* apply max current */ Math.min(MAX_CURRENT, battery.getDischargeMaxCurrent().orElse(0)) //
-				));
-		// Charge Max Current
-		// negative value is corrected as zero
-		IntegerWriteChannel chargeMaxCurrentChannel = this.channel(Sinexcel.ChannelId.CHARGE_MAX_A);
-		chargeMaxCurrentChannel.setNextWriteValue(//
-				/* enforce positive */ Math.max(0, //
-						/* apply max current */ Math.min(MAX_CURRENT, battery.getChargeMaxCurrent().orElse(0)) //
-				));
+		// Evaluate input data
+		if (battery == null) {
+			disMaxA = 0;
+			chaMaxA = 0;
+			disMinV = 0;
+			chaMaxV = 0;
+			voltage = 0;
+		} else {
+			disMaxA = battery.getDischargeMaxCurrent().orElse(0);
+			chaMaxA = battery.getChargeMaxCurrent().orElse(0);
+			disMinV = battery.getDischargeMinVoltage().orElse(0);
+			chaMaxV = battery.getChargeMaxVoltage().orElse(0);
+			voltage = battery.getVoltage().orElse(0);
+		}
+
+		// Set Inverter Registers
+		{
+			IntegerWriteChannel chargeMaxCurrentChannel = this.channel(Sinexcel.ChannelId.CHARGE_MAX_A);
+			chargeMaxCurrentChannel.setNextWriteValue(//
+					/* enforce positive */ Math.max(0, //
+							/* apply max current */ Math.min(MAX_CURRENT, chaMaxA) //
+					) * 10);
+		}
+		{
+			IntegerWriteChannel dischargeMaxCurrentChannel = this.channel(Sinexcel.ChannelId.DISCHARGE_MAX_A);
+			dischargeMaxCurrentChannel.setNextWriteValue(//
+					/* enforce positive */ Math.max(0, //
+							/* apply max current */ Math.min(MAX_CURRENT, disMaxA) //
+					) * 10);
+		}
+		{
+			IntegerWriteChannel dischargeMinVoltageChannel = this.channel(Sinexcel.ChannelId.DISCHARGE_MIN_V);
+			dischargeMinVoltageChannel.setNextWriteValue(disMinV * 10);
+		}
+		{
+			IntegerWriteChannel chargeMaxVoltageChannel = this.channel(Sinexcel.ChannelId.CHARGE_MAX_V);
+			chargeMaxVoltageChannel.setNextWriteValue(chaMaxV * 10);
+		}
+
+		// Calculate AllowedCharge- and -DischargePower
+		float allowedChargePower;
+		float allowedDischargePower;
+
+		// efficiency factor is not considered in chargeMaxCurrent (DC Power > AC Power)
+		allowedChargePower = chaMaxA * voltage * -1;
+		allowedDischargePower = disMaxA * voltage * efficiencyFactor;
+
+		// Allow max increase of 1 %
+		if (allowedDischargePower > lastAllowedDischargePower + allowedDischargePower * 0.01F) {
+			allowedDischargePower = lastAllowedDischargePower + allowedDischargePower * 0.01F;
+		}
+		this.lastAllowedDischargePower = allowedDischargePower;
+
+		if (allowedChargePower < lastAllowedChargePower + allowedChargePower * 0.01F) {
+			allowedChargePower = lastAllowedChargePower + allowedChargePower * 0.01F;
+		}
+		this.lastAllowedChargePower = allowedChargePower;
+
+		// Make sure solution is feasible
+		if (allowedChargePower > allowedDischargePower) { // Force Discharge
+			allowedDischargePower = allowedChargePower;
+		}
+		if (allowedDischargePower < allowedChargePower) { // Force Charge
+			allowedChargePower = allowedDischargePower;
+		}
+
+		//this._setAllowedChargePower(Math.round(allowedChargePower));
+		//this._setAllowedDischargePower(Math.round(allowedDischargePower));
+		
+		
+		
+		
+		
+//		// Discharge Min Voltage
+//		IntegerWriteChannel dischargeMinVoltageChannel = this.channel(Sinexcel.ChannelId.DISCHARGE_MIN_V);
+//		Integer dischargeMinVoltage = battery.getDischargeMinVoltage().get();
+//		dischargeMinVoltageChannel.setNextWriteValue(dischargeMinVoltage);
+//		// Charge Max Voltage
+//		IntegerWriteChannel chargeMaxVoltageChannel = this.channel(Sinexcel.ChannelId.CHARGE_MAX_V);
+//		Integer chargeMaxVoltage = battery.getChargeMaxVoltage().get();
+//		chargeMaxVoltageChannel.setNextWriteValue(chargeMaxVoltage);
+//
+//		// Discharge Max Current
+//		// negative value is corrected as zero
+//		IntegerWriteChannel dischargeMaxCurrentChannel = this.channel(Sinexcel.ChannelId.DISCHARGE_MAX_A);
+//		dischargeMaxCurrentChannel.setNextWriteValue(//
+//				/* enforce positive */ Math.max(0, //
+//						/* apply max current */ Math.min(MAX_CURRENT, battery.getDischargeMaxCurrent().orElse(0)) //
+//				));
+//		// Charge Max Current
+//		// negative value is corrected as zero
+//		IntegerWriteChannel chargeMaxCurrentChannel = this.channel(Sinexcel.ChannelId.CHARGE_MAX_A);
+//		chargeMaxCurrentChannel.setNextWriteValue(//
+//				/* enforce positive */ Math.max(0, //
+//						/* apply max current */ Math.min(MAX_CURRENT, battery.getChargeMaxCurrent().orElse(0)) //
+//				));
 	}
 
 	protected ModbusProtocol defineModbusProtocol() throws OpenemsException {
@@ -203,40 +290,53 @@ public class SinexcelImpl extends AbstractOpenemsModbusComponent implements Sine
 						m(Sinexcel.ChannelId.SET_INTERN_DC_RELAY, new UnsignedWordElement(0x0290))),
 
 				new FC6WriteRegisterTask(0x0087, //
-						m(Sinexcel.ChannelId.SET_ACTIVE_POWER, new SignedWordElement(0x0087),
-								ElementToChannelConverter.SCALE_FACTOR_MINUS_2)), //
+						m(Sinexcel.ChannelId.SET_ACTIVE_POWER, new SignedWordElement(0x0087))), // in 100 W
 				new FC6WriteRegisterTask(0x0088,
-						m(Sinexcel.ChannelId.SET_REACTIVE_POWER, new SignedWordElement(0x0088),
-								ElementToChannelConverter.SCALE_FACTOR_MINUS_2)), //
+						m(Sinexcel.ChannelId.SET_REACTIVE_POWER, new SignedWordElement(0x0088))), // in 100 var
 
-				new FC16WriteRegistersTask(0x032B, //
-						m(Sinexcel.ChannelId.CHARGE_MAX_A, new UnsignedWordElement(0x032B),
-								ElementToChannelConverter.SCALE_FACTOR_MINUS_2), //
-						m(Sinexcel.ChannelId.DISCHARGE_MAX_A, new UnsignedWordElement(0x032C),
-								ElementToChannelConverter.SCALE_FACTOR_MINUS_2)), //
+				new FC6WriteRegisterTask(0x032B, //
+						m(Sinexcel.ChannelId.CHARGE_MAX_A, new UnsignedWordElement(0x032B))), //
+				new FC6WriteRegisterTask(0x032C, //
+						m(Sinexcel.ChannelId.DISCHARGE_MAX_A, new UnsignedWordElement(0x032C))), //
 
 				new FC6WriteRegisterTask(0x0329,
 						m(Sinexcel.ChannelId.SET_SLOW_CHARGE_VOLTAGE, new UnsignedWordElement(0x0329))),
 				new FC6WriteRegisterTask(0x0328,
 						m(Sinexcel.ChannelId.SET_FLOAT_CHARGE_VOLTAGE, new UnsignedWordElement(0x0328))),
 
-				new FC16WriteRegistersTask(0x032D,
-						m(Sinexcel.ChannelId.DISCHARGE_MIN_V, new UnsignedWordElement(0x032D),
-								ElementToChannelConverter.SCALE_FACTOR_MINUS_1),
-						m(Sinexcel.ChannelId.CHARGE_MAX_V, new UnsignedWordElement(0x032E),
-								ElementToChannelConverter.SCALE_FACTOR_MINUS_1)),
+				new FC6WriteRegisterTask(0x032E,
+						m(Sinexcel.ChannelId.CHARGE_MAX_V, new UnsignedWordElement(0x032E))),
+				new FC6WriteRegisterTask(0x032D,
+						m(Sinexcel.ChannelId.DISCHARGE_MIN_V, new UnsignedWordElement(0x032D))),
+
 				new FC16WriteRegistersTask(0x007E,
 						m(Sinexcel.ChannelId.SET_ANALOG_CHARGE_ENERGY, new UnsignedDoublewordElement(0x007E))),
+				// new FC6WriteRegisterTask(0x007F,
+				// m(EssSinexcel.ChannelId.SET_ANALOG_CHARGE_ENERGY, new
+				// UnsignedWordElement(0x007F))),
+
 				new FC16WriteRegistersTask(0x0080,
 						m(Sinexcel.ChannelId.SET_ANALOG_DISCHARGE_ENERGY, new UnsignedDoublewordElement(0x0080))),
+				// new FC6WriteRegisterTask(0x0081,
+				// m(EssSinexcel.ChannelId.SET_ANALOG_DISCHARGE_ENERGY, new
+				// UnsignedWordElement(0x0081))),
+
 				new FC16WriteRegistersTask(0x0090,
 						m(Sinexcel.ChannelId.SET_ANALOG_DC_CHARGE_ENERGY, new UnsignedDoublewordElement(0x0090))),
+				// new FC6WriteRegisterTask(0x0091,
+				// m(EssSinexcel.ChannelId.SET_ANALOG_DC_CHARGE_ENERGY, new
+				// UnsignedWordElement(0x0091))),
+
 				new FC16WriteRegistersTask(0x0092,
 						m(Sinexcel.ChannelId.SET_ANALOG_DC_DISCHARGE_ENERGY, new UnsignedDoublewordElement(0x0092))),
+				// new FC6WriteRegisterTask(0x0093,
+				// m(EssSinexcel.ChannelId.SET_ANALOG_DC_DISCHARGE_ENERGY, new
+				// UnsignedWordElement(0x0093))),
 
 				new FC3ReadRegistersTask(0x0001, Priority.ONCE, //
 						m(Sinexcel.ChannelId.MODEL, new StringWordElement(0x0001, 16)), //
 						m(Sinexcel.ChannelId.SERIAL, new StringWordElement(0x0011, 8))), //
+
 				new FC3ReadRegistersTask(0x0065, Priority.LOW, //
 						m(Sinexcel.ChannelId.INVOUTVOLT_L1, new UnsignedWordElement(0x0065),
 								ElementToChannelConverter.SCALE_FACTOR_MINUS_1),
@@ -291,14 +391,6 @@ public class SinexcelImpl extends AbstractOpenemsModbusComponent implements Sine
 						m(Sinexcel.ChannelId.UPPER_VOLTAGE_LIMIT, new UnsignedWordElement(0x032E), //
 								ElementToChannelConverter.SCALE_FACTOR_MINUS_1)),
 
-				new FC3ReadRegistersTask(0x008A, Priority.LOW,
-						m(OffGridBatteryInverter.ChannelId.OFF_GRID_FREQUENCY, new SignedWordElement(0x008A), //
-								ElementToChannelConverter.SCALE_FACTOR_MINUS_1)),
-
-				new FC16WriteRegistersTask(0x008A,
-						m(OffGridBatteryInverter.ChannelId.OFF_GRID_FREQUENCY, new SignedWordElement(0x008A), //
-								ElementToChannelConverter.SCALE_FACTOR_MINUS_1)),
-
 				new FC3ReadRegistersTask(0x0262, Priority.LOW, //
 						m(new BitsWordElement(0x0262, this) //
 								.bit(0, Sinexcel.ChannelId.STATE_0) //
@@ -330,7 +422,7 @@ public class SinexcelImpl extends AbstractOpenemsModbusComponent implements Sine
 								.bit(8, Sinexcel.ChannelId.SINEXCEL_STATE_8) //
 								.bit(9, Sinexcel.ChannelId.SINEXCEL_STATE_9))),
 
-				new FC3ReadRegistersTask(0x0020, Priority.HIGH, //
+				new FC3ReadRegistersTask(0x0020, Priority.LOW, //
 						m(new BitsWordElement(0x0020, this) //
 								.bit(0, Sinexcel.ChannelId.STATE_16) //
 								.bit(1, Sinexcel.ChannelId.STATE_17) //
