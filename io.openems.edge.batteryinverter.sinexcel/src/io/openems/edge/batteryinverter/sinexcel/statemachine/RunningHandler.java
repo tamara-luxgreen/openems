@@ -1,6 +1,5 @@
 package io.openems.edge.batteryinverter.sinexcel.statemachine;
 
-import java.time.Duration;
 import java.time.Instant;
 
 import io.openems.common.exceptions.OpenemsError.OpenemsNamedException;
@@ -35,6 +34,8 @@ public class RunningHandler extends StateHandler<State, Context> {
 		// Apply Active and Reactive Power Set-Points
 		this.applyPower(context);
 
+		context.softStart(true);
+		inverter.setInverterOn();
 		return State.RUNNING;
 	}
 
@@ -52,24 +53,25 @@ public class RunningHandler extends StateHandler<State, Context> {
 			this.noPowerSince = null;
 
 			IntegerWriteChannel setActivePower = inverter.channel(Sinexcel.ChannelId.SET_ACTIVE_POWER);
-			setActivePower.setNextWriteValue(context.setActivePower);
+			setActivePower.setNextWriteValue(context.setActivePower/ 100);
 
 			IntegerWriteChannel setReactivePower = inverter.channel(Sinexcel.ChannelId.SET_REACTIVE_POWER);
-			setReactivePower.setNextWriteValue(context.setReactivePower);
+			setReactivePower.setNextWriteValue(context.setReactivePower/ 100);
 
-		} else {
-			// Prepare for power-saving mode
-			if (this.noPowerSince == null) {
-				this.noPowerSince = Instant.now();
-			}
-
-			if ( /* time with 0 power passed */
-			Duration.between(this.noPowerSince, Instant.now()).getSeconds() > POWER_SAVING_MODE_SECONDS
-					/* inverter is running */
-					&& inverter.getInverterState().orElse(false)) {
-				inverter.setInverterOff();
-			}
-		}
+		} 
+//		else {
+//		//	 Prepare for power-saving mode
+//			if (this.noPowerSince == null) {
+//				this.noPowerSince = Instant.now();
+//			}
+//
+//			if ( /* time with 0 power passed */
+//			Duration.between(this.noPowerSince, Instant.now()).getSeconds() > POWER_SAVING_MODE_SECONDS
+//					/* inverter is running */
+//					&& inverter.getInverterState().orElse(false)) {
+//				inverter.setInverterOff();
+//			}
+//		}
 
 	}
 
