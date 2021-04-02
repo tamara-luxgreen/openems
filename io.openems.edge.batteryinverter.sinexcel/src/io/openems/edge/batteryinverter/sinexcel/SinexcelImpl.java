@@ -97,10 +97,10 @@ public class SinexcelImpl extends AbstractOpenemsModbusComponent implements Sine
 	public SinexcelImpl() throws OpenemsNamedException {
 		super(//
 				OpenemsComponent.ChannelId.values(), //
-				OffGridBatteryInverter.ChannelId.values(), //
 				SymmetricBatteryInverter.ChannelId.values(), //
 				ManagedSymmetricBatteryInverter.ChannelId.values(), //
 				StartStoppable.ChannelId.values(), //
+				OffGridBatteryInverter.ChannelId.values(), //
 				Sinexcel.ChannelId.values() //
 		);
 		this._setMaxApparentPower(SinexcelImpl.MAX_APPARENT_POWER);
@@ -153,10 +153,6 @@ public class SinexcelImpl extends AbstractOpenemsModbusComponent implements Sine
 		}
 	}
 
-	
-
-//	private float lastAllowedChargePower = 0;
-//	private float lastAllowedDischargePower = 0;
 	/**
 	 * Sets the Battery Limits.
 	 * 
@@ -191,7 +187,7 @@ public class SinexcelImpl extends AbstractOpenemsModbusComponent implements Sine
 
 	protected ModbusProtocol defineModbusProtocol() throws OpenemsException {
 		return new ModbusProtocol(this, //
-
+				
 				new FC6WriteRegisterTask(0x028A, //
 						m(OffGridBatteryInverter.ChannelId.MOD_ON_CMD, new UnsignedWordElement(0x028A))),
 				new FC6WriteRegisterTask(0x028B, //
@@ -202,58 +198,80 @@ public class SinexcelImpl extends AbstractOpenemsModbusComponent implements Sine
 						m(OffGridBatteryInverter.ChannelId.ON_GRID_CMD, new UnsignedWordElement(0x028D))),
 				new FC6WriteRegisterTask(0x028E, //
 						m(OffGridBatteryInverter.ChannelId.OFF_GRID_CMD, new UnsignedWordElement(0x028E))),
-
 				new FC6WriteRegisterTask(0x0290, // FIXME: not documented!
 						m(Sinexcel.ChannelId.SET_INTERN_DC_RELAY, new UnsignedWordElement(0x0290))),
-
+				new FC16WriteRegistersTask(0x008A,
+						m(OffGridBatteryInverter.ChannelId.OFF_GRID_FREQUENCY, new SignedWordElement(0x008A), //
+								ElementToChannelConverter.SCALE_FACTOR_MINUS_1)),
 				new FC6WriteRegisterTask(0x0087, //
-						m(Sinexcel.ChannelId.SET_ACTIVE_POWER, new SignedWordElement(0x0087))), // in 100 W
-				new FC6WriteRegisterTask(0x0088,
-						m(Sinexcel.ChannelId.SET_REACTIVE_POWER, new SignedWordElement(0x0088))), // in 100 var
-
-				new FC6WriteRegisterTask(0x032B, //
-						m(Sinexcel.ChannelId.CHARGE_MAX_A, new UnsignedWordElement(0x032B))), //
-				new FC6WriteRegisterTask(0x032C, //
-						m(Sinexcel.ChannelId.DISCHARGE_MAX_A, new UnsignedWordElement(0x032C))), //
+						m(Sinexcel.ChannelId.SET_ACTIVE_POWER, new SignedWordElement(0x0087),
+								ElementToChannelConverter.SCALE_FACTOR_2)), // in 100 W
+				new FC6WriteRegisterTask(0x0088, //
+						m(Sinexcel.ChannelId.SET_REACTIVE_POWER, new SignedWordElement(0x0088),
+								ElementToChannelConverter.SCALE_FACTOR_2)), // in 100 var
 
 				new FC6WriteRegisterTask(0x0329,
 						m(Sinexcel.ChannelId.SET_SLOW_CHARGE_VOLTAGE, new UnsignedWordElement(0x0329))),
 				new FC6WriteRegisterTask(0x0328,
 						m(Sinexcel.ChannelId.SET_FLOAT_CHARGE_VOLTAGE, new UnsignedWordElement(0x0328))),
-
-				new FC6WriteRegisterTask(0x032E,
-						m(Sinexcel.ChannelId.CHARGE_MAX_V, new UnsignedWordElement(0x032E))),
-				new FC6WriteRegisterTask(0x032D,
-						m(Sinexcel.ChannelId.DISCHARGE_MIN_V, new UnsignedWordElement(0x032D))),
-
+				new FC16WriteRegistersTask(0x032D,
+						m(Sinexcel.ChannelId.DISCHARGE_MIN_V, new UnsignedWordElement(0x032D),
+								ElementToChannelConverter.SCALE_FACTOR_MINUS_1),
+						m(Sinexcel.ChannelId.CHARGE_MAX_V, new UnsignedWordElement(0x032E),
+								ElementToChannelConverter.SCALE_FACTOR_MINUS_1)),
 				new FC16WriteRegistersTask(0x007E,
 						m(Sinexcel.ChannelId.SET_ANALOG_CHARGE_ENERGY, new UnsignedDoublewordElement(0x007E))),
-				// new FC6WriteRegisterTask(0x007F,
-				// m(EssSinexcel.ChannelId.SET_ANALOG_CHARGE_ENERGY, new
-				// UnsignedWordElement(0x007F))),
-
 				new FC16WriteRegistersTask(0x0080,
 						m(Sinexcel.ChannelId.SET_ANALOG_DISCHARGE_ENERGY, new UnsignedDoublewordElement(0x0080))),
-				// new FC6WriteRegisterTask(0x0081,
-				// m(EssSinexcel.ChannelId.SET_ANALOG_DISCHARGE_ENERGY, new
-				// UnsignedWordElement(0x0081))),
-
 				new FC16WriteRegistersTask(0x0090,
 						m(Sinexcel.ChannelId.SET_ANALOG_DC_CHARGE_ENERGY, new UnsignedDoublewordElement(0x0090))),
-				// new FC6WriteRegisterTask(0x0091,
-				// m(EssSinexcel.ChannelId.SET_ANALOG_DC_CHARGE_ENERGY, new
-				// UnsignedWordElement(0x0091))),
-
 				new FC16WriteRegistersTask(0x0092,
 						m(Sinexcel.ChannelId.SET_ANALOG_DC_DISCHARGE_ENERGY, new UnsignedDoublewordElement(0x0092))),
-				// new FC6WriteRegisterTask(0x0093,
-				// m(EssSinexcel.ChannelId.SET_ANALOG_DC_DISCHARGE_ENERGY, new
-				// UnsignedWordElement(0x0093))),
+				
+				new FC3ReadRegistersTask(0x028A, Priority.LOW, //
+						m(OffGridBatteryInverter.ChannelId.MOD_ON_CMD, new UnsignedWordElement(0x028A))),
+				new FC3ReadRegistersTask(0x028B, Priority.LOW, //
+						m(OffGridBatteryInverter.ChannelId.MOD_OFF_CMD, new UnsignedWordElement(0x028B))),
+				new FC3ReadRegistersTask(0x028C, Priority.LOW, //
+						m(Sinexcel.ChannelId.CLEAR_FAILURE_CMD, new UnsignedWordElement(0x028C))),
+				new FC3ReadRegistersTask(0x028D, Priority.LOW, //
+						m(OffGridBatteryInverter.ChannelId.ON_GRID_CMD, new UnsignedWordElement(0x028D))),
+				new FC3ReadRegistersTask(0x028E, Priority.LOW, //
+						m(OffGridBatteryInverter.ChannelId.OFF_GRID_CMD, new UnsignedWordElement(0x028E))),
+				new FC3ReadRegistersTask(0x0290, Priority.LOW, // FIXME: not documented!
+						m(Sinexcel.ChannelId.SET_INTERN_DC_RELAY, new UnsignedWordElement(0x0290))),
+				
+				new FC3ReadRegistersTask(0x028A, Priority.LOW, //
+						m(OffGridBatteryInverter.ChannelId.MOD_ON_CMD, new UnsignedWordElement(0x028A))),
+				new FC3ReadRegistersTask(0x028B, Priority.LOW, //
+						m(OffGridBatteryInverter.ChannelId.MOD_OFF_CMD, new UnsignedWordElement(0x028B))),
+				new FC3ReadRegistersTask(0x028C, Priority.LOW, //
+						m(Sinexcel.ChannelId.CLEAR_FAILURE_CMD, new UnsignedWordElement(0x028C))),
+				new FC3ReadRegistersTask(0x028D, Priority.LOW, //
+						m(OffGridBatteryInverter.ChannelId.ON_GRID_CMD, new UnsignedWordElement(0x028D))),
+				new FC3ReadRegistersTask(0x028E, Priority.LOW, //
+						m(OffGridBatteryInverter.ChannelId.OFF_GRID_CMD, new UnsignedWordElement(0x028E))),
+				new FC3ReadRegistersTask(0x0290, Priority.LOW, // FIXME: not documented!
+						m(Sinexcel.ChannelId.SET_INTERN_DC_RELAY, new UnsignedWordElement(0x0290))),
+				new FC3ReadRegistersTask(0x032B, Priority.LOW, //
+						m(Sinexcel.ChannelId.CHARGE_MAX_A, new UnsignedWordElement(0x032B),
+								ElementToChannelConverter.SCALE_FACTOR_MINUS_2)), //
+				new FC3ReadRegistersTask(0x032C, Priority.LOW, //
+						m(Sinexcel.ChannelId.DISCHARGE_MAX_A, new UnsignedWordElement(0x032C),
+								ElementToChannelConverter.SCALE_FACTOR_MINUS_2)), //
+				new FC3ReadRegistersTask(0x032E, Priority.LOW, //
+						m(Sinexcel.ChannelId.CHARGE_MAX_V, new UnsignedWordElement(0x032E),
+								ElementToChannelConverter.SCALE_FACTOR_MINUS_1)),
+				new FC3ReadRegistersTask(0x032D, Priority.LOW, //
+						m(Sinexcel.ChannelId.DISCHARGE_MIN_V, new UnsignedWordElement(0x032D),
+								ElementToChannelConverter.SCALE_FACTOR_MINUS_1)),
 
+				new FC3ReadRegistersTask(0x008A, Priority.LOW,
+						m(OffGridBatteryInverter.ChannelId.OFF_GRID_FREQUENCY, new SignedWordElement(0x008A), //
+								ElementToChannelConverter.SCALE_FACTOR_MINUS_1)),
 				new FC3ReadRegistersTask(0x0001, Priority.ONCE, //
 						m(Sinexcel.ChannelId.MODEL, new StringWordElement(0x0001, 16)), //
 						m(Sinexcel.ChannelId.SERIAL, new StringWordElement(0x0011, 8))), //
-
 				new FC3ReadRegistersTask(0x0065, Priority.LOW, //
 						m(Sinexcel.ChannelId.INVOUTVOLT_L1, new UnsignedWordElement(0x0065),
 								ElementToChannelConverter.SCALE_FACTOR_MINUS_1),

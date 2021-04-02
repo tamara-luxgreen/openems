@@ -22,7 +22,7 @@ public class RunningHandler extends StateHandler<State, Context> {
 	public State runAndGetNextState(Context context) throws OpenemsNamedException {
 		Sinexcel inverter = context.getParent();
 		context.setclearFailureCommand();
-		if ( inverter.hasFaults() || !inverter.getInverterState().orElse(true)) {
+		if (inverter.hasFaults() || !inverter.getInverterState().orElse(true)) {
 					return State.UNDEFINED;
 		}
 
@@ -51,12 +51,17 @@ public class RunningHandler extends StateHandler<State, Context> {
 //			this.noPowerSince = null;
 
 			IntegerWriteChannel setActivePower = inverter.channel(Sinexcel.ChannelId.SET_ACTIVE_POWER);
-			setActivePower.setNextWriteValue(context.setActivePower/ 100);
+			setActivePower.setNextWriteValue(context.setActivePower);
 
 			IntegerWriteChannel setReactivePower = inverter.channel(Sinexcel.ChannelId.SET_REACTIVE_POWER);
-			setReactivePower.setNextWriteValue(context.setReactivePower/ 100);
+			setReactivePower.setNextWriteValue(context.setReactivePower);
+		} else {
+			IntegerWriteChannel setActivePower = inverter.channel(Sinexcel.ChannelId.SET_ACTIVE_POWER);
+			setActivePower.setNextWriteValue(0);
 
-		} 
+			IntegerWriteChannel setReactivePower = inverter.channel(Sinexcel.ChannelId.SET_REACTIVE_POWER);
+			setReactivePower.setNextWriteValue(0);
+		}
 //		else {
 //		//	 Prepare for power-saving mode
 //			if (this.noPowerSince == null) {
