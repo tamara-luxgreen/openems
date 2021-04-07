@@ -11,8 +11,8 @@ public class StoppedHandler extends StateHandler<State, Context> {
 	public State runAndGetNextState(Context context) {
 		// Mark as stopped
 		Sinexcel inverter = context.getParent();
+		// Grid is On?
 		inverter._setStartStop(StartStop.STOP);
-
 		return State.STOPPED;
 	}
 

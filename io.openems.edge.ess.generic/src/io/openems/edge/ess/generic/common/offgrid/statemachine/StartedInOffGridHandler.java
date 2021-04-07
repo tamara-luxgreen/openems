@@ -54,10 +54,15 @@ public class StartedInOffGridHandler extends StateHandler<OffGridState, OffGridC
 				return OffGridState.STARTED_IN_OFF_GRID;
 			}
 		}
+		if (context.battery.getSoc().get() < context.allowedMinSocInOffGrid  || context.battery.getMinCellVoltage().get() < context.allowedMinCellVoltageInOffGrid) {
+			context.offGridSwitch.handleWritingDigitalOutputForGroundingContactor(false);
+			context.offGridSwitch.handleWritingDigitalOutputForMainContactor(true);
+			return OffGridState.STOP_BATTERY_INVERTER;
+		}
 		ess._setStartStop(StartStop.START);
 		context.batteryInverter.setOffgridCommand(true);
 		context.batteryInverter.setOffGridFrequency(52);
 		context.getParent()._setGridMode(GridMode.OFF_GRID);
-		return OffGridState.STOP_BATTERY_INVERTER_BEFORE_SWITCH;
+		return OffGridState.STARTED_IN_OFF_GRID;
 	}
 }

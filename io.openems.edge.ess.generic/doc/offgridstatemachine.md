@@ -6,7 +6,7 @@ Undefined -->|target START | GridSwitch
 
 GridSwitch -->|On Grid|StartBatteryInOnGrid
 GridSwitch -->|Off Grid && soc >5 |StartBatteryInOffGrid
-GridSwitch -->|Off Grid && soc <5 |StopBatteryInverter
+GridSwitch -->|Off Grid and --soc <5% or min Cell Volt < 2.8V--  |StopBatteryInverter
 
 StartBatteryInOnGrid -->|not timeout| StartBatteryInOnGrid
 StartBatteryInOnGrid -->|isStarted| StartBatteryInverterInOnGrid
@@ -18,6 +18,7 @@ StartBatteryInverterInOnGrid -->|timeout| Undefined
 
 StartedInOnGrid -->|Battery+BatteryInverter.isStarted && everythingOk| StartedInOnGrid
 StartedInOnGrid -->|isGridOff| StopBatteryInverterBeforeSwitch
+StartedInOnGrid -->|timeout| Undefined
 
 StopBatteryInverterBeforeSwitch -->|isInverterStopped| Undefined
 
@@ -31,6 +32,8 @@ StartBatteryInverterInOffGrid -->|timeout| Undefined
 
 StartedInOffGrid -->|Battery+BatteryInverter.isStarted && everythingOk| StartedInOffGrid
 StartedInOffGrid -->|isGridOn| StopBatteryInverterBeforeSwitch
+StartedInOffGrid -->|timeout| Undefined
+StartedInOffGrid -->| soc <5% or min Cell Volt < 2.8V |StopBatteryInverter
 
 Undefined -->|target STOP| StopBatteryInverter
 
