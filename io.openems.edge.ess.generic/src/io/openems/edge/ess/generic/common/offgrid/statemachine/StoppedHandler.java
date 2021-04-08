@@ -11,19 +11,6 @@ public class StoppedHandler extends StateHandler<OffGridState, OffGridContext> {
 	@Override
 	public OffGridState runAndGetNextState(OffGridContext context) {
 		GenericManagedEss ess = context.getParent();
-
-		if (ess.hasFaults()) {
-			return OffGridState.UNDEFINED;
-		}
-
-		if (!context.battery.isStopped()) {
-			return OffGridState.UNDEFINED;
-		}
-
-		if (!context.batteryInverter.isStopped()) {
-			return OffGridState.UNDEFINED;
-		}
-
 		// Grid is On?
 		if (!context.offGridSwitch.getGridStatus()) {
 			context.getParent()._setGridMode(GridMode.UNDEFINED);

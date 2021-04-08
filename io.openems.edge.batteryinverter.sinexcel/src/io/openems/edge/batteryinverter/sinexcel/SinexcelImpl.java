@@ -187,7 +187,7 @@ public class SinexcelImpl extends AbstractOpenemsModbusComponent implements Sine
 
 	protected ModbusProtocol defineModbusProtocol() throws OpenemsException {
 		return new ModbusProtocol(this, //
-				
+
 				new FC6WriteRegisterTask(0x028A, //
 						m(OffGridBatteryInverter.ChannelId.MOD_ON_CMD, new UnsignedWordElement(0x028A))),
 				new FC6WriteRegisterTask(0x028B, //
@@ -227,7 +227,7 @@ public class SinexcelImpl extends AbstractOpenemsModbusComponent implements Sine
 						m(Sinexcel.ChannelId.SET_ANALOG_DC_CHARGE_ENERGY, new UnsignedDoublewordElement(0x0090))),
 				new FC16WriteRegistersTask(0x0092,
 						m(Sinexcel.ChannelId.SET_ANALOG_DC_DISCHARGE_ENERGY, new UnsignedDoublewordElement(0x0092))),
-				
+
 				new FC3ReadRegistersTask(0x028A, Priority.LOW, //
 						m(OffGridBatteryInverter.ChannelId.MOD_ON_CMD, new UnsignedWordElement(0x028A))),
 				new FC3ReadRegistersTask(0x028B, Priority.LOW, //
@@ -240,7 +240,7 @@ public class SinexcelImpl extends AbstractOpenemsModbusComponent implements Sine
 						m(OffGridBatteryInverter.ChannelId.OFF_GRID_CMD, new UnsignedWordElement(0x028E))),
 				new FC3ReadRegistersTask(0x0290, Priority.LOW, // FIXME: not documented!
 						m(Sinexcel.ChannelId.SET_INTERN_DC_RELAY, new UnsignedWordElement(0x0290))),
-				
+
 				new FC3ReadRegistersTask(0x028A, Priority.LOW, //
 						m(OffGridBatteryInverter.ChannelId.MOD_ON_CMD, new UnsignedWordElement(0x028A))),
 				new FC3ReadRegistersTask(0x028B, Priority.LOW, //
@@ -316,10 +316,10 @@ public class SinexcelImpl extends AbstractOpenemsModbusComponent implements Sine
 								ElementToChannelConverter.SCALE_FACTOR_MINUS_1),
 						new DummyRegisterElement(0x0256), //
 						m(Sinexcel.ChannelId.DC_VOLTAGE, new UnsignedWordElement(0x0257),
-								ElementToChannelConverter.SCALE_FACTOR_MINUS_1),
-						new DummyRegisterElement(0x0258, 0x0259), //
-						m(Sinexcel.ChannelId.SINEXCEL_STATE, new UnsignedWordElement(0x025A))), //
+								ElementToChannelConverter.SCALE_FACTOR_MINUS_1)),
 
+				new FC3ReadRegistersTask(0x0260, Priority.HIGH,
+						m(Sinexcel.ChannelId.SINEXCEL_STATE, new UnsignedWordElement(0x0260))), //
 				new FC3ReadRegistersTask(0x032D, Priority.LOW,
 						m(Sinexcel.ChannelId.LOWER_VOLTAGE_LIMIT, new UnsignedWordElement(0x032D), //
 								ElementToChannelConverter.SCALE_FACTOR_MINUS_1),
@@ -345,19 +345,7 @@ public class SinexcelImpl extends AbstractOpenemsModbusComponent implements Sine
 								.bit(14, Sinexcel.ChannelId.STATE_14) //
 								.bit(15, Sinexcel.ChannelId.STATE_15))),
 
-				new FC3ReadRegistersTask(0x0260, Priority.LOW, //
-						m(new BitsWordElement(0x0260, this) //
-								.bit(1, Sinexcel.ChannelId.SINEXCEL_STATE_1) //
-								.bit(2, Sinexcel.ChannelId.SINEXCEL_STATE_2) //
-								.bit(3, Sinexcel.ChannelId.SINEXCEL_STATE_3) //
-								.bit(4, Sinexcel.ChannelId.SINEXCEL_STATE_4) //
-								.bit(5, Sinexcel.ChannelId.SINEXCEL_STATE_5) //
-								.bit(6, Sinexcel.ChannelId.SINEXCEL_STATE_6) //
-								.bit(7, Sinexcel.ChannelId.SINEXCEL_STATE_7) //
-								.bit(8, Sinexcel.ChannelId.SINEXCEL_STATE_8) //
-								.bit(9, Sinexcel.ChannelId.SINEXCEL_STATE_9))),
-
-				new FC3ReadRegistersTask(0x0020, Priority.LOW, //
+				new FC3ReadRegistersTask(0x0020, Priority.HIGH, //
 						m(new BitsWordElement(0x0020, this) //
 								.bit(0, Sinexcel.ChannelId.STATE_16) //
 								.bit(1, Sinexcel.ChannelId.STATE_17) //
