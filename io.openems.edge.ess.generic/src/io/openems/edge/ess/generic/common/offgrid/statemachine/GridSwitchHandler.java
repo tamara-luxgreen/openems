@@ -28,21 +28,28 @@ public class GridSwitchHandler extends StateHandler<OffGridState, OffGridContext
 
 		// isOngrid ?
 		if (!context.offGridSwitch.getGridStatus()) {
-			context.offGridSwitch.handleWritingDigitalOutputForGroundingContactor(false);
 			context.offGridSwitch.handleWritingDigitalOutputForMainContactor(false);
-			return OffGridState.START_BATTERY_IN_ON_GRID;
+			context.offGridSwitch.handleWritingDigitalOutputForGroundingContactor(false);
+			if (!context.offGridSwitch.getMainContactor() && !context.offGridSwitch.getGroundingContactor()) {
+				return OffGridState.START_BATTERY_IN_ON_GRID;
+			}
+			return OffGridState.GRID_SWITCH;
 		}
 
 		// isOffgrid ?
 		if (context.offGridSwitch.getGridStatus()) {
-			if (context.battery.getSoc().get() < context.allowedMinSocInOffGrid  || context.battery.getMinCellVoltage().get() < context.allowedMinCellVoltageInOffGrid) {
-				context.offGridSwitch.handleWritingDigitalOutputForGroundingContactor(false);
+			if (context.battery.getSoc().get() < context.allowedMinSocInOffGrid
+					|| context.battery.getMinCellVoltage().get() < context.allowedMinCellVoltageInOffGrid) {
 				context.offGridSwitch.handleWritingDigitalOutputForMainContactor(true);
+				context.offGridSwitch.handleWritingDigitalOutputForGroundingContactor(false);
 				return OffGridState.STOP_BATTERY_INVERTER;
 			} else {
 				context.offGridSwitch.handleWritingDigitalOutputForMainContactor(false);
 				context.offGridSwitch.handleWritingDigitalOutputForGroundingContactor(true);
-				return OffGridState.START_BATTERY_IN_OFF_GRID;
+				if (context.offGridSwitch.getMainContactor() && context.offGridSwitch.getGroundingContactor()) {
+					return OffGridState.START_BATTERY_IN_OFF_GRID;
+				}
+				return OffGridState.GRID_SWITCH;
 			}
 		}
 		return OffGridState.GRID_SWITCH;
