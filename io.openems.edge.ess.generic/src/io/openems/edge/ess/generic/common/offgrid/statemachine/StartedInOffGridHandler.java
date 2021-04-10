@@ -25,10 +25,6 @@ public class StartedInOffGridHandler extends StateHandler<OffGridState, OffGridC
 	public OffGridState runAndGetNextState(OffGridContext context) throws OpenemsNamedException {
 		GenericManagedEss ess = context.getParent();
 
-		Instant now = Instant.now();
-		// Just hard coded 65 sec waiting
-		long waitingSeconds = 65;
-
 		if (ess.hasFaults()) {
 			return OffGridState.UNDEFINED;
 		}
@@ -43,7 +39,9 @@ public class StartedInOffGridHandler extends StateHandler<OffGridState, OffGridC
 
 		// Grid is On?
 		if (!context.offGridSwitch.getGridStatus()) {
-
+			Instant now = Instant.now();
+			// Just hard coded 65 sec waiting
+			long waitingSeconds = 65;
 			boolean isWaitingTimePassed = Duration.between(this.lastAttempt, now).getSeconds() > waitingSeconds;
 
 			if (isWaitingTimePassed) {

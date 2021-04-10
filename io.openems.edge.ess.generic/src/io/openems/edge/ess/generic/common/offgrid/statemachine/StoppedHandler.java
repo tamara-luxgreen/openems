@@ -12,7 +12,7 @@ public class StoppedHandler extends StateHandler<OffGridState, OffGridContext> {
 	public OffGridState runAndGetNextState(OffGridContext context) {
 		GenericManagedEss ess = context.getParent();
 		// Grid is On?
-		if (!context.offGridSwitch.getGridStatus()) {
+		if (!context.offGridSwitch.getGridStatus() && ess.getStartStopTarget() == StartStop.START) {
 			context.getParent()._setGridMode(GridMode.UNDEFINED);
 			ess._setStartStop(StartStop.START);
 			return OffGridState.UNDEFINED;
