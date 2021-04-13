@@ -38,18 +38,12 @@ public class GridSwitchHandler extends StateHandler<OffGridState, OffGridContext
 
 		// isOffgrid ?
 		if (context.offGridSwitch.getGridStatus()) {
-			if (context.getParent().getAllowedDischargePower().orElse(0) == 0) {
-				context.offGridSwitch.handleWritingDigitalOutputForMainContactor(true);
-				context.offGridSwitch.handleWritingDigitalOutputForGroundingContactor(false);
-				return OffGridState.STOP_BATTERY_INVERTER;
-			} else {
 				context.offGridSwitch.handleWritingDigitalOutputForMainContactor(false);
 				context.offGridSwitch.handleWritingDigitalOutputForGroundingContactor(true);
 				if (context.offGridSwitch.getMainContactor() && context.offGridSwitch.getGroundingContactor()) {
 					return OffGridState.START_BATTERY_IN_OFF_GRID;
 				}
 				return OffGridState.GRID_SWITCH;
-			}
 		}
 		return OffGridState.GRID_SWITCH;
 	}

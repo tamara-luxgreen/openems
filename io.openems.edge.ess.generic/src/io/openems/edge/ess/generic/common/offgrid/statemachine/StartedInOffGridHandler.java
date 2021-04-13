@@ -52,10 +52,17 @@ public class StartedInOffGridHandler extends StateHandler<OffGridState, OffGridC
 				return OffGridState.STARTED_IN_OFF_GRID;
 			}
 		}
+
 		if (context.getParent().getAllowedDischargePower().orElse(0) == 0) {
-			context.offGridSwitch.handleWritingDigitalOutputForGroundingContactor(false);
-			context.offGridSwitch.handleWritingDigitalOutputForMainContactor(true);
-			return OffGridState.STOP_BATTERY_INVERTER;
+			Instant now = Instant.now();
+			// Just hard coded 65 sec waiting
+			long waitingSeconds = 5;
+			boolean isWaitingTimePassed = Duration.between(this.lastAttempt, now).getSeconds() > waitingSeconds;
+			if (isWaitingTimePassed) {
+				context.offGridSwitch.handleWritingDigitalOutputForGroundingContactor(false);
+				context.offGridSwitch.handleWritingDigitalOutputForMainContactor(true);
+				return OffGridState.STOP_BATTERY_INVERTER;
+			}
 		}
 		ess._setStartStop(StartStop.START);
 		context.batteryInverter.setOffgridCommand(true);
