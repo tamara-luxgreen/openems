@@ -38,8 +38,7 @@ public class GridSwitchHandler extends StateHandler<OffGridState, OffGridContext
 
 		// isOffgrid ?
 		if (context.offGridSwitch.getGridStatus()) {
-			if (context.battery.getSoc().get() < context.allowedMinSocInOffGrid
-					|| context.battery.getMinCellVoltage().get() < context.allowedMinCellVoltageInOffGrid) {
+			if (context.getParent().getAllowedDischargePower().orElse(0) <= 0) {
 				context.offGridSwitch.handleWritingDigitalOutputForMainContactor(true);
 				context.offGridSwitch.handleWritingDigitalOutputForGroundingContactor(false);
 				return OffGridState.STOP_BATTERY_INVERTER;

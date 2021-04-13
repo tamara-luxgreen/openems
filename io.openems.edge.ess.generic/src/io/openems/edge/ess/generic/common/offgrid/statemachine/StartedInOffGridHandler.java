@@ -52,7 +52,7 @@ public class StartedInOffGridHandler extends StateHandler<OffGridState, OffGridC
 				return OffGridState.STARTED_IN_OFF_GRID;
 			}
 		}
-		if (context.battery.getSoc().get() < context.allowedMinSocInOffGrid  || context.battery.getMinCellVoltage().get() < context.allowedMinCellVoltageInOffGrid) {
+		if (context.getParent().getAllowedDischargePower().orElse(0) <= 0) {
 			context.offGridSwitch.handleWritingDigitalOutputForGroundingContactor(false);
 			context.offGridSwitch.handleWritingDigitalOutputForMainContactor(true);
 			return OffGridState.STOP_BATTERY_INVERTER;
