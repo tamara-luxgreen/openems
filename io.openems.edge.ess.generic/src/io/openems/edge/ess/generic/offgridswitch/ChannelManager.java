@@ -10,5 +10,4 @@ public class ChannelManager extends AbstractGenericEssChannelManager<Battery, Of
 	public ChannelManager(GenericManagedEss parent) {
 		super(parent);
 	}
-
 }

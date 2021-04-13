@@ -77,7 +77,7 @@ public class GenericOffGridEssImpl extends AbstractGenericOffGridEss<Battery, Of
 	@Activate
 	void activate(ComponentContext context, Config config) {
 		super.activate(context, config.id(), config.alias(), config.enabled(), config.startStop(), this.cm,
-				config.batteryInverter_id(), config.battery_id(), config.ioOffGridSwitch_id(), config.allowedMinSocInOffGrid(), config.allowedMinCellVoltageInOffGrid());
+				config.batteryInverter_id(), config.battery_id(), config.ioOffGridSwitch_id());
 	}
 
 	@Deactivate
