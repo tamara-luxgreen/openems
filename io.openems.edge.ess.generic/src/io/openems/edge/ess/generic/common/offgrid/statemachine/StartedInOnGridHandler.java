@@ -1,6 +1,5 @@
 package io.openems.edge.ess.generic.common.offgrid.statemachine;
 
-import java.time.Duration;
 import java.time.Instant;
 
 import io.openems.common.exceptions.OpenemsError.OpenemsNamedException;
@@ -24,10 +23,6 @@ public class StartedInOnGridHandler extends StateHandler<OffGridState, OffGridCo
 	public OffGridState runAndGetNextState(OffGridContext context) throws OpenemsNamedException {
 		GenericManagedEss ess = context.getParent();
 
-		Instant now = Instant.now();
-		// Just hard coded 3 sec waiting
-		long waitingSeconds = 3;
-
 		if (ess.hasFaults()) {
 			return OffGridState.UNDEFINED;
 		}
@@ -42,17 +37,8 @@ public class StartedInOnGridHandler extends StateHandler<OffGridState, OffGridCo
 
 		// Grid is Off
 		if (context.offGridSwitch.getGridStatus()) {
-
-			boolean isWaitingTimePassed = Duration.between(this.lastAttempt, now).getSeconds() > waitingSeconds;
-
-			if (isWaitingTimePassed) {
-				context.batteryInverter.setOngridCommand(false);
-				return OffGridState.STOP_BATTERY_INVERTER_BEFORE_SWITCH;
-			} else {
-
-				context.getParent()._setGridMode(GridMode.UNDEFINED);
-				return OffGridState.STARTED_IN_ON_GRID;
-			}
+			context.batteryInverter.setOngridCommand(false);
+			return OffGridState.STOP_BATTERY_INVERTER_BEFORE_SWITCH;
 		}
 		context.batteryInverter.setOngridCommand(true);
 		context.getParent()._setGridMode(GridMode.ON_GRID);

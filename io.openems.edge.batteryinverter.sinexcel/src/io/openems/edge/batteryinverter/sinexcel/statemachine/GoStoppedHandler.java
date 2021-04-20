@@ -10,6 +10,7 @@ public class GoStoppedHandler extends StateHandler<State, Context> {
 	@Override
 	public State runAndGetNextState(Context context) throws OpenemsNamedException {
 		Sinexcel inverter = context.getParent();
+		context.setclearFailureCommand();
 
 		context.softStart(false);
 		inverter.setInverterOff();
