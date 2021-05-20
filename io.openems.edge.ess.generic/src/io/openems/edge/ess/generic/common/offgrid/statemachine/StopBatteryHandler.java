@@ -46,13 +46,10 @@ public class StopBatteryHandler extends StateHandler<OffGridState, OffGridContex
 				this.lastAttempt = Instant.now();
 				this.attemptCounter++;
 				return OffGridState.STOP_BATTERY;
-
 			}
-
 		} else {
 			// Still waiting...
 			return OffGridState.STOP_BATTERY;
 		}
 	}
-
 }

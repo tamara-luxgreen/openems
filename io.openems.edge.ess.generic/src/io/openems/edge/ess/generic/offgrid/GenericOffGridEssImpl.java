@@ -1,4 +1,4 @@
-package io.openems.edge.ess.generic.offgridswitch;
+package io.openems.edge.ess.generic.offgrid;
 
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.ComponentContext;

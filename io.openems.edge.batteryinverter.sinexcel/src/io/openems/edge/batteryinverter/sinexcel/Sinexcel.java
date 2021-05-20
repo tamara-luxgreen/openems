@@ -57,10 +57,16 @@ public interface Sinexcel extends OffGridBatteryInverter, ManagedSymmetricBatter
 				.unit(Unit.AMPERE) //
 				.onInit(new IntegerWriteChannel.MirrorToDebugChannel(Sinexcel.ChannelId.DEBUG_DISCHARGE_MAX_A))), //
 
-		SET_SLOW_CHARGE_VOLTAGE(Doc.of(OpenemsType.INTEGER) //
+		SET_TOPPING_CHARGE_VOLTAGE(Doc.of(OpenemsType.INTEGER) //
 				.accessMode(AccessMode.READ_WRITE) //
 				.unit(Unit.VOLT)),
 		SET_FLOAT_CHARGE_VOLTAGE(Doc.of(OpenemsType.INTEGER) //
+				.accessMode(AccessMode.READ_WRITE) //
+				.unit(Unit.VOLT)),
+		TOPPING_CHARGE_VOLTAGE(Doc.of(OpenemsType.INTEGER) //
+				.accessMode(AccessMode.READ_WRITE) //
+				.unit(Unit.VOLT)),
+		FLOAT_CHARGE_VOLTAGE(Doc.of(OpenemsType.INTEGER) //
 				.accessMode(AccessMode.READ_WRITE) //
 				.unit(Unit.VOLT)),
 

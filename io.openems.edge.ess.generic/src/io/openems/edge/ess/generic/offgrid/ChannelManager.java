@@ -1,4 +1,4 @@
-package io.openems.edge.ess.generic.offgridswitch;
+package io.openems.edge.ess.generic.offgrid;
 
 import io.openems.edge.battery.api.Battery;
 import io.openems.edge.batteryinverter.api.OffGridBatteryInverter;

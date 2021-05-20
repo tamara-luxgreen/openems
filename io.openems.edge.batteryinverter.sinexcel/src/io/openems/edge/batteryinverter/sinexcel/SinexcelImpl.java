@@ -211,7 +211,7 @@ public class SinexcelImpl extends AbstractOpenemsModbusComponent implements Sine
 								ElementToChannelConverter.SCALE_FACTOR_2)), // in 100 var
 
 				new FC6WriteRegisterTask(0x0329,
-						m(Sinexcel.ChannelId.SET_SLOW_CHARGE_VOLTAGE, new UnsignedWordElement(0x0329))),
+						m(Sinexcel.ChannelId.SET_TOPPING_CHARGE_VOLTAGE, new UnsignedWordElement(0x0329))),
 				new FC6WriteRegisterTask(0x0328,
 						m(Sinexcel.ChannelId.SET_FLOAT_CHARGE_VOLTAGE, new UnsignedWordElement(0x0328))),
 				new FC16WriteRegistersTask(0x032D,
@@ -265,7 +265,11 @@ public class SinexcelImpl extends AbstractOpenemsModbusComponent implements Sine
 				new FC3ReadRegistersTask(0x032D, Priority.LOW, //
 						m(Sinexcel.ChannelId.DISCHARGE_MIN_V, new UnsignedWordElement(0x032D),
 								ElementToChannelConverter.SCALE_FACTOR_MINUS_1)),
-
+				
+				new FC3ReadRegistersTask(0x0328,Priority.LOW,//
+						m(Sinexcel.ChannelId.FLOAT_CHARGE_VOLTAGE, new UnsignedWordElement(0x0328)),
+						m(Sinexcel.ChannelId.TOPPING_CHARGE_VOLTAGE, new UnsignedWordElement(0x0329))),
+				
 				new FC3ReadRegistersTask(0x008A, Priority.LOW,
 						m(OffGridBatteryInverter.ChannelId.OFF_GRID_FREQUENCY, new SignedWordElement(0x008A), //
 								ElementToChannelConverter.SCALE_FACTOR_MINUS_1)),

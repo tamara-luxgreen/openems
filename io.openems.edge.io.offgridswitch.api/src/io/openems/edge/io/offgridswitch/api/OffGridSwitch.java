@@ -116,7 +116,6 @@ public interface OffGridSwitch extends OpenemsComponent {
 		this.getGroundingContactorChannel().setNextValue(value);
 	}
 
-
 	/**
 	 * Gets the Channel for {@link ChannelId#GRID_STATUS}.
 	 * 

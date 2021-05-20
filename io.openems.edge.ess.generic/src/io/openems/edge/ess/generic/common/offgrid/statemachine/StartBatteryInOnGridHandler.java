@@ -26,7 +26,6 @@ public class StartBatteryInOnGridHandler extends StateHandler<OffGridState, OffG
 		GenericManagedEss ess = context.getParent();
 
 		if (context.battery.isStarted()) {
-			// TODO should we check here the other parameters defined in Battery Nature.
 			return OffGridState.START_BATTERY_INVERTER_IN_ON_GRID;
 		}
 
