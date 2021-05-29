@@ -43,6 +43,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import io.openems.common.exceptions.OpenemsException;
+import io.openems.common.utils.ThreadPoolUtils;
 import io.openems.edge.bridge.modbus.api.AbstractOpenemsModbusComponent;
 import io.openems.edge.bridge.modbus.api.BridgeModbusTcp;
 import io.openems.edge.bridge.modbus.api.ModbusProtocol;
@@ -161,7 +162,7 @@ public class Wago extends AbstractOpenemsModbusComponent implements DigitalOutpu
 
 	private static Document downloadConfigXml(InetAddress ip, String filename, String username, String password)
 			throws ParserConfigurationException, SAXException, IOException {
-		URL url = new URL(String.format("http://%s/etc/%s", ip.getHostAddress(), filename));
+		URL url = new URL(String.format("http://%s/etc/%s",ip.getHostAddress() , filename));
 		String authStr = String.format("%s:%s", username, password);
 		byte[] bytesEncoded = Base64.getEncoder().encode(authStr.getBytes());
 		String authEncoded = new String(bytesEncoded);
@@ -290,17 +291,7 @@ public class Wago extends AbstractOpenemsModbusComponent implements DigitalOutpu
 		if (this.configFuture != null) {
 			this.configFuture.cancel(true);
 		}
-		try {
-			this.configExecutor.shutdown();
-			this.configExecutor.awaitTermination(5, TimeUnit.SECONDS);
-		} catch (InterruptedException e) {
-			this.logWarn(this.log, "tasks interrupted");
-		} finally {
-			if (!this.configExecutor.isTerminated()) {
-				this.logWarn(this.log, "cancel non-finished tasks");
-			}
-			this.configExecutor.shutdownNow();
-		}
+		ThreadPoolUtils.shutdownAndAwaitTermination(this.configExecutor, 5);
 	}
 
 	@Override
