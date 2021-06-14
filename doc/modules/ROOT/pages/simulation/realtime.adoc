@@ -16,7 +16,7 @@ OpenEMS provides several virtual devices for testing and development. To set up 
 == Simulator Components
 
 * `Simulator DataSource: CSV Reader`: Reads .csv files and provides their content according to the `io.openems.edge.simulator.datasource.api.SimulatorDatasource` interface. Its package contains several sample csv-files for different devices and situations.
-* `Simulator EssSymmetric Reacting`: Simulates the State of Charge of a ess device. Its behavior depends on configured controllers.
+* `Simulator EssSymmetric Reacting`: Simulates the State of Charge of an ess device. Its behavior depends on configured controllers.
 * `Simulator GridMeter Acting`: Intended to represent grid consumption/production. Portrays a datasource' values. It requests those tagged with the "ActivePower" key. The values are portrayed in the `SimulatedActivePower`, `ActivePower` and - divided by three - in the `ActivePowerL1`, `ActivePowerL2` and `ActivePowerL3` channels.
 * `Simulator ProductionMeter Acting`: Intended to represent fixed production like photovoltaic arrays. To date the functionality equals the one of `Simulator GridMeter Acting`.
 * `Simulator NRCMeter Acting`: Intended to represent non-regulated-consumption. To date the functionality equals the one of `Simulator GridMeter Acting`.
